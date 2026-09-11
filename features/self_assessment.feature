@@ -30,8 +30,14 @@ Feature: self-assessment
     When I filter goals by "Pending"
     Then I should only see goals without an assigned concept
 
-    
+
   Scenario: view previous self-assessment history
     Given I have submitted a self-assessment in a previous session
     When I access the "Assessment History" tab
     Then I should see my past submitted concepts listed by date
+
+    
+  Scenario: teacher updates student concept
+    Given I am logged in as a teacher
+    When I change the concept of student "Ian Monteiro" to "MANA"
+    Then the system updates the concept successfully
