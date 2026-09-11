@@ -24,3 +24,14 @@ Feature: self-assessment
     Given I am at the "Self-assessment" page
     When I assign an invalid concept "XYZ" to a goal
     Then the system prevents the assignment and shows "Invalid concept"  
+    
+  Scenario: experimental self-assessment goal filtering
+    Given I am on the self-assessment tab
+    When I filter goals by "Pending"
+    Then I should only see goals without an assigned concept
+
+    
+  Scenario: view previous self-assessment history
+    Given I have submitted a self-assessment in a previous session
+    When I access the "Assessment History" tab
+    Then I should see my past submitted concepts listed by date
