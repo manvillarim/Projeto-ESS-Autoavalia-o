@@ -18,6 +18,7 @@ Feature: self-assessment
     Given the student "Ian Monteiro" has not assigned concepts to all goals
     When I submit the self-assessment for student "Ian Monteiro"
     Then the system displays an error message "All goals must be evaluated"
+    Then I am prompted to complete all pending assessments
     
   Scenario: invalid concept assignment
     Given I am at the "Self-assessment" page
