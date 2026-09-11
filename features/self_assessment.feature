@@ -36,8 +36,9 @@ Feature: self-assessment
     When I access the "Assessment History" tab
     Then I should see my past submitted concepts listed by date
 
-    
-  Scenario: teacher updates student concept
+
+  Scenario: teacher updates student concept after review
     Given I am logged in as a teacher
     When I change the concept of student "Ian Monteiro" to "MANA"
-    Then the system updates the concept successfully
+    And I add a feedback note "Revisão efetuada com sucesso"
+    Then the system updates the concept and logs the note successfully
