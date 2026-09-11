@@ -13,3 +13,8 @@ Feature: self-assessment
     Given the student "Ian Monteiro" has no self-assessment concept stored
     When I submit the self-assessment "MPA" for student "Ian Monteiro"
     Then the system stores concept "MPA" for student "Ian Monteiro"
+
+  Scenario: submission with missing required goals
+    Given the student "Ian Monteiro" has not assigned concepts to all goals
+    When I submit the self-assessment for student "Ian Monteiro"
+    Then the system displays an error message "All goals must be evaluated"
