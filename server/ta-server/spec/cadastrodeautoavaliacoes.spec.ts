@@ -37,6 +37,24 @@ describe("O cadastro de auto-avaliações", () => {
     expect(cadastro.autoavaliacaoDe(CPF_BRUNO).metasAvaliadas().length).toBe(1);
   })
 
+  it("remove o conceito de uma meta, preservando o das demais", () => {
+    cadastro.registrarConceito(CPF_BRUNO, ESPECIFICAR, "MPA");
+    cadastro.registrarConceito(CPF_BRUNO, TESTES, "MA");
+
+    var resultado = cadastro.removerConceito(CPF_BRUNO, ESPECIFICAR);
+
+    expect(resultado.sucedeu()).toBe(true);
+    expect(cadastro.autoavaliacaoDe(CPF_BRUNO).possuiConceitoPara(ESPECIFICAR)).toBe(false);
+    expect(cadastro.autoavaliacaoDe(CPF_BRUNO).conceitoDe(TESTES).toString()).toBe("MA");
+  })
+
+  it("não remove o conceito de uma meta que não tem conceito registrado", () => {
+    var resultado = cadastro.removerConceito(CPF_BRUNO, TESTES);
+
+    expect(resultado.sucedeu()).toBe(false);
+    expect(resultado.getErro()).toContain(TESTES);
+  })
+
   it("mantém separadas as auto-avaliações de alunos diferentes", () => {
     cadastro.registrarConceito(CPF_BRUNO, ESPECIFICAR, "MA");
     cadastro.registrarConceito("962", ESPECIFICAR, "MANA");

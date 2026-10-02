@@ -18,6 +18,13 @@ export class CadastroDeAutoavaliacoes {
     return Resultado.sucesso();
   }
 
+  removerConceito(cpf: string, meta: string): Resultado {
+    if (!this.autoavaliacaoDe(cpf).remover(meta)) {
+      return Resultado.falha('A meta "' + meta + '" não tem conceito registrado');
+    }
+    return Resultado.sucesso();
+  }
+
   // Devolve a auto-avaliação do aluno na turma, criando uma vazia na primeira
   // vez que o aluno a acessa, para que o cliente nunca precise tratar null.
   autoavaliacaoDe(cpf: string): Autoavaliacao {
