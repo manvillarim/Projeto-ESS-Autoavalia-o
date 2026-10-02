@@ -13,14 +13,37 @@ export class CadastroDeAutoavaliacoes {
   constructor(private readonly turma: Turma) {}
 
   registrarConceito(cpf: string, meta: string, conceito: string): Resultado {
+    var impedimento: Resultado = this.impedimentoParaAlterar(meta);
+    if (!impedimento.sucedeu()) return impedimento;
+
     var conceitoRegistrado: Conceito = Conceito.de(conceito);
+    if (conceitoRegistrado === null) {
+      return Resultado.falha('"' + conceito + '" não é um conceito válido; os conceitos aceitos são '
+                             + Conceito.aceitos().join(", "));
+    }
+
     this.autoavaliacaoDe(cpf).registrar(meta, conceitoRegistrado);
     return Resultado.sucesso();
   }
 
   removerConceito(cpf: string, meta: string): Resultado {
+    var impedimento: Resultado = this.impedimentoParaAlterar(meta);
+    if (!impedimento.sucedeu()) return impedimento;
+
     if (!this.autoavaliacaoDe(cpf).remover(meta)) {
       return Resultado.falha('A meta "' + meta + '" não tem conceito registrado');
+    }
+    return Resultado.sucesso();
+  }
+
+  // Condições que valem para qualquer alteração da auto-avaliação, reunidas em
+  // um único lugar para que registrar e remover não as repitam.
+  private impedimentoParaAlterar(meta: string): Resultado {
+    if (!this.turma.estaComAutoavaliacaoAberta()) {
+      return Resultado.falha('A auto-avaliação de "' + this.turma.getNome() + '" está encerrada');
+    }
+    if (!this.turma.possuiMeta(meta)) {
+      return Resultado.falha('A meta "' + meta + '" não pertence a "' + this.turma.getNome() + '"');
     }
     return Resultado.sucesso();
   }

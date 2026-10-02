@@ -55,6 +55,46 @@ describe("O cadastro de auto-avaliações", () => {
     expect(resultado.getErro()).toContain(TESTES);
   })
 
+  it("não registra um conceito que a turma não aceita", () => {
+    var resultado = cadastro.registrarConceito(CPF_BRUNO, TESTES, "XYZ");
+
+    expect(resultado.sucedeu()).toBe(false);
+    expect(resultado.getErro()).toContain("XYZ");
+    expect(resultado.getErro()).toContain("MA, MPA, MANA");
+    expect(cadastro.autoavaliacaoDe(CPF_BRUNO).possuiConceitoPara(TESTES)).toBe(false);
+  })
+
+  it("não registra conceito para uma meta que não pertence à turma", () => {
+    var outraMeta = "Understand configuration management concepts";
+
+    var resultado = cadastro.registrarConceito(CPF_BRUNO, outraMeta, "MA");
+
+    expect(resultado.sucedeu()).toBe(false);
+    expect(resultado.getErro()).toContain(outraMeta);
+    expect(cadastro.autoavaliacaoDe(CPF_BRUNO).estaVazia()).toBe(true);
+  })
+
+  it("não altera a auto-avaliação depois que a turma a encerra", () => {
+    cadastro.registrarConceito(CPF_BRUNO, ESPECIFICAR, "MPA");
+    turma.fecharAutoavaliacao();
+
+    var resultado = cadastro.registrarConceito(CPF_BRUNO, ESPECIFICAR, "MA");
+
+    expect(resultado.sucedeu()).toBe(false);
+    expect(resultado.getErro()).toContain("ESS 2025.1");
+    expect(cadastro.autoavaliacaoDe(CPF_BRUNO).conceitoDe(ESPECIFICAR).toString()).toBe("MPA");
+  })
+
+  it("não remove conceito depois que a turma encerra a auto-avaliação", () => {
+    cadastro.registrarConceito(CPF_BRUNO, ESPECIFICAR, "MPA");
+    turma.fecharAutoavaliacao();
+
+    var resultado = cadastro.removerConceito(CPF_BRUNO, ESPECIFICAR);
+
+    expect(resultado.sucedeu()).toBe(false);
+    expect(cadastro.autoavaliacaoDe(CPF_BRUNO).conceitoDe(ESPECIFICAR).toString()).toBe("MPA");
+  })
+
   it("mantém separadas as auto-avaliações de alunos diferentes", () => {
     cadastro.registrarConceito(CPF_BRUNO, ESPECIFICAR, "MA");
     cadastro.registrarConceito("962", ESPECIFICAR, "MANA");
