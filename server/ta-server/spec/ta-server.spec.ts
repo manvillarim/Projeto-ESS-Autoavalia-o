@@ -132,4 +132,21 @@ describe("O servidor", () => {
         .then(body => expect(body.distribuicao).toEqual([{discrepancia: 0, quantidade: 0}, {discrepancia: 1, quantidade: 1}]));
   })
 
+  it("notifica o professor inscrito sobre o novo aluno discrepante depois do recálculo", () => {
+    var turma = base_url + "turma/" + encodeURIComponent("Turma Notificada");
+    var meta = "Write quality tests";
+    return request.put(turma, {"json": {"metas": [meta], "limiar": 0}})
+        .then(() => request.put(turma + "/notificacoes/assinatura", {"json": true}))
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Carlos", "cpf": "50"}}))
+        .then(() => request.put(turma + "/professor/50", {"json": {"meta": meta, "conceito": "MANA"}}))
+        .then(() => request.put(turma + "/autoavaliacao/50", {"json": {"meta": meta, "conceito": "MA"}}))
+        .then(() => request.get(turma + "/notificacoes", {"json": true}))
+        .then(body => {
+            expect(body.notificacoes).toEqual([]);
+            return request.post(turma + "/recalculo", {"json": true});
+        })
+        .then(() => request.get(turma + "/notificacoes", {"json": true}))
+        .then(body => expect(body.notificacoes[0].nome).toBe("Carlos"));
+  })
+
 })

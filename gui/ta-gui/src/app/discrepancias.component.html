@@ -7,6 +7,10 @@
 <p name="erro" *ngIf="erro">{{erro}}</p>
 
 <div *ngIf="relatorio">
+  <div name="notificacoes" *ngIf="notificacoes.length > 0">
+    <p name="notificacao" *ngFor="let n of notificacoes">{{n.mensagem}}</p>
+  </div>
+
   <button type="button" name="abalista" (click)="mostrarLista()">Discrepant students</button>
   <button type="button" name="abadistribuicao" (click)="mostrarDistribuicao()">Discrepancy distribution</button>
 

@@ -91,6 +91,12 @@ let nomesEntreAspas = ((texto: string) => (texto.match(/"([^"]*)"/g) || []).map(
 let linhaDo = ((aluno: string) => element.all(by.name('discrepante'))
                                          .filter(e => e.element(by.name('nomediscrepante')).getText().then(t => t === aluno)));
 
+let irParaDiscrepancias = (async () => {
+    await browser.get("http://localhost:4200/");
+    await expect(browser.getTitle()).to.eventually.equal('TaGui');
+    await $("a[name='discrepancias']").click();
+});
+
 let abrirDiscrepancias = (async (turma: string) => {
     await $("input[name='turmabox']").sendKeys(turma);
     await $("button[name='abrirbtn']").click();
@@ -99,9 +105,7 @@ let abrirDiscrepancias = (async (turma: string) => {
 defineSupportCode(function ({ Given, When, Then }) {
     Given(/^I am on the discrepancies page of the class "([^\"]*)"$/, async (turma: any) => {
         ultimaTurma = turma;
-        await browser.get("http://localhost:4200/");
-        await expect(browser.getTitle()).to.eventually.equal('TaGui');
-        await $("a[name='discrepancias']").click();
+        await irParaDiscrepancias();
     });
 
     Given(/^"([^\"]*)" has only the goals (.*)$/, async (turma: any, metas: any) => {
@@ -187,7 +191,25 @@ defineSupportCode(function ({ Given, When, Then }) {
         }
     });
 
+    Given(/^I am registered to receive notifications of the class "([^\"]*)"$/, async (turma: any) => {
+        ultimaTurma = turma;
+        await garantirMetas(turma);
+        estadoDe(turma).limiar = 1;
+        await publicar(turma);
+        await chamar('PUT', caminhoDaTurma(turma) + '/notificacoes/assinatura');
+    });
+
+    Given(/^a new student of "([^\"]*)" starts to have a discrepancy above the defined threshold$/, async (turma: any) => {
+        let metas = estadoDe(turma).metas;
+        await atribuir('professor', turma, "New student", metas.map(() => "MANA").join(', '));
+        await atribuir('autoavaliacao', turma, "New student", metas.map(() => "MA").join(', '));
+    });
+
     When(/^I open the discrepancies page of "([^\"]*)"$/, abrirDiscrepancias);
+
+    When(/^the system recomputes the discrepancies of the class$/, async () => {
+        await chamar('POST', caminhoDaTurma(ultimaTurma) + '/recalculo');
+    });
 
     When(/^I click on "Export to CSV"$/, async () => {
         arquivo = null;
@@ -247,6 +269,12 @@ defineSupportCode(function ({ Given, When, Then }) {
         let quantidades = barras.map(b => b.element(by.name('quantidadebarra')).getText());
         await expect(rotulos).to.eventually.deep.equal(distribuicaoEsperada.map(f => String(f[0])));
         await expect(quantidades).to.eventually.deep.equal(distribuicaoEsperada.map(f => String(f[1])));
+    });
+
+    Then(/^I receive a notification informing the new discrepant student$/, async () => {
+        await irParaDiscrepancias();
+        await abrirDiscrepancias(ultimaTurma);
+        await expect(element(by.name('notificacao')).getText()).to.eventually.contain('New student');
     });
 
     Then(/^I see an error message stating that the class was not found$/, async () => {

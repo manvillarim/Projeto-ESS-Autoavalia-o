@@ -8,6 +8,7 @@ import {CadastroDeAlunos} from './cadastrodealunos';
 import {CadastroDeAutoavaliacoes} from './cadastrodeautoavaliacoes';
 import {CadastroDeTurmas, TurmaMatriculada} from './cadastrodeturmas';
 import {AnaliseDeDiscrepancias} from './analisedediscrepancias';
+import {NotificadorDeDiscrepancias} from './notificadordediscrepancias';
 
 var app = express();
 
@@ -19,6 +20,16 @@ var autoavaliacoes: CadastroDeAutoavaliacoes = new CadastroDeAutoavaliacoes(turm
 
 var turmas: CadastroDeTurmas = new CadastroDeTurmas();
 turmas.adicionar(new TurmaMatriculada(turma, autoavaliacoes));
+
+var notificadores: { [turma: string]: NotificadorDeDiscrepancias } = {};
+
+// Cria o notificador da turma na primeira vez que é pedido, para que ele preserve o que já conhece.
+function notificadorDe(nome: string, matriculada: TurmaMatriculada): NotificadorDeDiscrepancias {
+  if (!Object.prototype.hasOwnProperty.call(notificadores, nome)) {
+    notificadores[nome] = new NotificadorDeDiscrepancias(matriculada);
+  }
+  return notificadores[nome];
+}
 
 var allowCrossDomain = function(req: any, res: any, next: any) {
     res.header('Access-Control-Allow-Origin', "*");
@@ -105,12 +116,33 @@ app.get('/turma/:nome/discrepancias/distribuicao', function (req: express.Reques
             "distribuicao": new AnaliseDeDiscrepancias(matriculada).distribuicao()});
 })
 
+app.put('/turma/:nome/notificacoes/assinatura', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  notificadorDe(req.params.nome, matriculada).inscrever();
+  res.send({"success": "O professor passará a ser notificado sobre os novos alunos discrepantes"});
+})
+
+app.post('/turma/:nome/recalculo', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  var novas = notificadorDe(req.params.nome, matriculada).recalcular();
+  res.send({"success": "As discrepâncias da turma foram recalculadas", "novasNotificacoes": novas.length});
+})
+
+app.get('/turma/:nome/notificacoes', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  res.send({"notificacoes": notificadorDe(req.params.nome, matriculada).getNotificacoes()});
+})
+
 // Stubs das funcionalidades de turma e de conceitos do professor, de outros membros
 // da equipe: permitem montar a situação de uma turma para os testes de aceitação.
 app.put('/turma/:nome', function (req: express.Request, res: express.Response) {
   var nova: Turma = new Turma(req.params.nome, req.body.metas);
   nova.definirLimiarDeDiscrepancia(req.body.limiar);
   turmas.adicionar(new TurmaMatriculada(nova));
+  delete notificadores[req.params.nome];
   res.send({"success": "A turma foi cadastrada com sucesso"});
 })
 
