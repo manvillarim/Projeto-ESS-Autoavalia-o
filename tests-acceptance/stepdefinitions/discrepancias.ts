@@ -96,6 +96,26 @@ defineSupportCode(function ({ Given, When, Then }) {
         await atribuir('autoavaliacao', turma, aluno, doAluno);
     });
 
+    Given(/^every student of "([^\"]*)" has a discrepancy lower than or equal to "(\d*)"$/, async (turma: any, limite: any) => {
+        let estado = estadoDe(turma);
+        if (estado.metas.length === 0) {
+            estado.metas = ["Specify requirements with quality", "Write quality tests"];
+            await publicar(turma);
+        }
+        // Um aluno sem divergência e outro com divergência exatamente igual ao limite.
+        let restante = Number(limite);
+        let doAluno = estado.metas.map(() => {
+            let divergencia = Math.min(restante, 2);
+            restante -= divergencia;
+            return ["MA", "MPA", "MANA"][divergencia];
+        });
+        let doProfessor = estado.metas.map(() => "MA");
+        await atribuir('professor', turma, "Student without divergence", doProfessor.join(', '));
+        await atribuir('autoavaliacao', turma, "Student without divergence", doProfessor.join(', '));
+        await atribuir('professor', turma, "Student at the limit", doProfessor.join(', '));
+        await atribuir('autoavaliacao', turma, "Student at the limit", doAluno.join(', '));
+    });
+
     When(/^I open the discrepancies page of "([^\"]*)"$/, async (turma: any) => {
         await $("input[name='turmabox']").sendKeys(<string> turma);
         await $("button[name='abrirbtn']").click();
@@ -105,6 +125,10 @@ defineSupportCode(function ({ Given, When, Then }) {
         let linhas = linhaDo(aluno);
         await expect(linhas.count()).to.eventually.equal(1);
         await expect(linhas.first().element(by.name('valordiscrepancia')).getText()).to.eventually.equal(valor);
+    });
+
+    Then(/^I see the list of discrepant students empty$/, async () => {
+        await expect(element.all(by.name('discrepante')).count()).to.eventually.equal(0);
     });
 
     Then(/^I do not see "([^\"]*)" in the list of discrepant students$/, async (aluno: any) => {

@@ -8,7 +8,9 @@
   <p>Alunos discrepantes: <span name="quantidade">{{relatorio.quantidadeDeDiscrepantes}}</span></p>
   <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>
 
-  <table name="listadiscrepantes">
+  <p name="listavazia" *ngIf="relatorio.discrepantes.length === 0">Nenhum aluno discrepante nesta turma.</p>
+
+  <table name="listadiscrepantes" *ngIf="relatorio.discrepantes.length > 0">
     <tr>
       <th>Aluno</th>
       <th>Discrepância</th>

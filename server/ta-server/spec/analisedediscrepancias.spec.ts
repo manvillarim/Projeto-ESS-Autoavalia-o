@@ -51,4 +51,19 @@ describe("A análise de discrepâncias", () => {
     expect(carlos.conceitosDoProfessor[ESPECIFICAR]).toBe("MANA");
     expect(carlos.conceitosDoAluno[ESPECIFICAR]).toBe("MA");
   })
+
+  describe("quando nenhum aluno excede o limiar", () => {
+    beforeEach(() => {
+      turma.definirLimiarDeDiscrepancia(4);
+    })
+
+    it("devolve a lista de discrepantes vazia, com contagem e percentual zerados", () => {
+      var relatorio = analise.relatorio();
+
+      expect(relatorio.discrepantes).toEqual([]);
+      expect(relatorio.quantidadeDeDiscrepantes()).toBe(0);
+      expect(relatorio.percentualDeDiscrepantes()).toBe(0);
+      expect(relatorio.totalDeAlunos).toBe(3);
+    })
+  })
 })
