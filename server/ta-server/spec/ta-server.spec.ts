@@ -92,4 +92,18 @@ describe("O servidor", () => {
     })
   })
 
+  it("ordena os alunos discrepantes por discrepância decrescente quando solicitado", () => {
+    var metas = ["Specify requirements with quality", "Write quality tests"];
+    var turma = base_url + "turma/" + encodeURIComponent("Turma Ordenada");
+    var conceito = (rota: string, cpf: string, valor: string) =>
+        request.put(turma + rota + cpf, {"json": {"meta": metas[0], "conceito": valor}});
+    return request.put(turma, {"json": {"metas": [metas[0]], "limiar": 0}})
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Rafael", "cpf": "20"}}))
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Carlos", "cpf": "21"}}))
+        .then(() => conceito("/professor/", "20", "MPA")).then(() => conceito("/autoavaliacao/", "20", "MA"))
+        .then(() => conceito("/professor/", "21", "MANA")).then(() => conceito("/autoavaliacao/", "21", "MA"))
+        .then(() => request.get(turma + "/discrepancias?ordem=discrepancia-decrescente", {"json": true}))
+        .then(body => expect(body.discrepantes.map((d: any) => d.nome)).toEqual(["Carlos", "Rafael"]));
+  })
+
 })

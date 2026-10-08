@@ -22,6 +22,13 @@ export class RelatorioDeDiscrepancias {
               readonly discrepantes: AlunoDiscrepante[],
               readonly naoCalculaveis: AlunoSemDiscrepancia[]) {}
 
+  // Do aluno com maior discrepância para o de menor; em empate, por nome, para que a ordem seja determinística.
+  ordenadoPorDiscrepanciaDecrescente(): RelatorioDeDiscrepancias {
+    var ordenados: AlunoDiscrepante[] = this.discrepantes.slice().sort((a, b) =>
+        (b.discrepancia - a.discrepancia) || a.aluno.nome.localeCompare(b.aluno.nome));
+    return new RelatorioDeDiscrepancias(this.turma, this.limiar, this.totalDeAlunos, ordenados, this.naoCalculaveis);
+  }
+
   quantidadeDeDiscrepantes(): number {
     return this.discrepantes.length;
   }

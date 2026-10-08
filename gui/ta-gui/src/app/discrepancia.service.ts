@@ -8,8 +8,9 @@ export class DiscrepanciaService {
 
   constructor(private http: Http) { }
 
-  getDiscrepancias(turma: string): Promise<any> {
-    return this.http.get(this.taURL + "/turma/" + encodeURIComponent(turma) + "/discrepancias")
+  getDiscrepancias(turma: string, ordenado: boolean = false): Promise<any> {
+    var ordem: string = ordenado ? "?ordem=discrepancia-decrescente" : "";
+    return this.http.get(this.taURL + "/turma/" + encodeURIComponent(turma) + "/discrepancias" + ordem)
              .toPromise()
              .then(res => res.json())
              .catch(erro => this.tratarErro(erro));

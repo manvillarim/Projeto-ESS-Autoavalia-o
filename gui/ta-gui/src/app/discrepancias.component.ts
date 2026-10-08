@@ -15,7 +15,15 @@ export class DiscrepanciasComponent {
    erro: string = null;
 
    abrir(): void {
-      this.discrepanciaService.getDiscrepancias(this.nomeDaTurma)
+      this.buscar(false);
+   }
+
+   ordenarPorDiscrepancia(): void {
+      this.buscar(true);
+   }
+
+   private buscar(ordenado: boolean): void {
+      this.discrepanciaService.getDiscrepancias(this.nomeDaTurma, ordenado)
          .then(relatorio => { this.relatorio = relatorio; this.erro = null; })
          .catch(erro => { this.relatorio = null; this.erro = erro; });
    }

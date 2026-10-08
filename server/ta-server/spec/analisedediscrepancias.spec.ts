@@ -116,4 +116,34 @@ describe("A análise de discrepâncias", () => {
       expect(analise.relatorio().discrepantes.map(d => d.aluno.nome)).toContain("João");
     })
   })
+
+  describe("ao ordenar os alunos discrepantes", () => {
+    beforeEach(() => {
+      turma.definirLimiarDeDiscrepancia(1);
+      matriculada.matricular("Zeca", "7");
+      atribuir("professor", "7", ["MANA", "MPA"]); atribuir("aluno", "7", ["MA", "MA"]);
+    })
+
+    it("coloca primeiro o aluno de maior discrepância", () => {
+      var nomes = analise.relatorio().ordenadoPorDiscrepanciaDecrescente().discrepantes.map(d => d.aluno.nome);
+
+      expect(nomes).toEqual(["Carlos", "Zeca", "Rafael"]);
+    })
+
+    it("desempata pelo nome do aluno", () => {
+      matriculada.matricular("Ana", "8");
+      atribuir("professor", "8", ["MANA", "MPA"]); atribuir("aluno", "8", ["MA", "MA"]);
+
+      var nomes = analise.relatorio().ordenadoPorDiscrepanciaDecrescente().discrepantes.map(d => d.aluno.nome);
+
+      expect(nomes).toEqual(["Carlos", "Ana", "Zeca", "Rafael"]);
+    })
+
+    it("não altera a ordem de matrícula do relatório original", () => {
+      var relatorio = analise.relatorio();
+      relatorio.ordenadoPorDiscrepanciaDecrescente();
+
+      expect(relatorio.discrepantes.map(d => d.aluno.nome)).toEqual(["Carlos", "Rafael", "Zeca"]);
+    })
+  })
 })

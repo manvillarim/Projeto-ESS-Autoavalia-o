@@ -143,7 +143,18 @@ defineSupportCode(function ({ Given, When, Then }) {
         await matricular(ultimaTurma, aluno);
     });
 
+    Given(/^"([^\"]*)" has the following students:$/, async (turma: any, tabela: any) => {
+        for (let linha of tabela.hashes()) {
+            await atribuir('professor', turma, linha['student'], linha['professor concepts']);
+            await atribuir('autoavaliacao', turma, linha['student'], linha['student concepts']);
+        }
+    });
+
     When(/^I open the discrepancies page of "([^\"]*)"$/, abrirDiscrepancias);
+
+    When(/^I sort the list of discrepant students by decreasing discrepancy$/, async () => {
+        await $("button[name='ordenarbtn']").click();
+    });
 
     When(/^I try to open the discrepancies page of the class "([^\"]*)"$/, abrirDiscrepancias);
 
@@ -166,6 +177,11 @@ defineSupportCode(function ({ Given, When, Then }) {
 
     Then(/^I see a suggestion to assign the pending concepts of the student "([^\"]*)"$/, async (aluno: any) => {
         await expect(element(by.name('sugestao')).getText()).to.eventually.contain('Atribua os conceitos pendentes de ' + aluno);
+    });
+
+    Then(/^I see the discrepant students in the order (.*)$/, async (ordem: any) => {
+        let nomes = element.all(by.name('nomediscrepante')).map(e => e.getText());
+        await expect(nomes).to.eventually.deep.equal(nomesEntreAspas(ordem));
     });
 
     Then(/^I see an error message stating that the class was not found$/, async () => {

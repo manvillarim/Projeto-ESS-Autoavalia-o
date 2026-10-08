@@ -77,6 +77,7 @@ app.get('/turma/:nome/discrepancias', function (req: express.Request, res: expre
   var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
   if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
   var relatorio = new AnaliseDeDiscrepancias(matriculada).relatorio();
+  if (req.query.ordem === 'discrepancia-decrescente') relatorio = relatorio.ordenadoPorDiscrepanciaDecrescente();
   res.send({"turma": relatorio.turma, "limiar": relatorio.limiar,
             "totalDeAlunos": relatorio.totalDeAlunos,
             "quantidadeDeDiscrepantes": relatorio.quantidadeDeDiscrepantes(),

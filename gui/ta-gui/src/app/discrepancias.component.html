@@ -12,6 +12,9 @@
 
   <p name="listavazia" *ngIf="relatorio.discrepantes.length === 0">Nenhum aluno discrepante nesta turma.</p>
 
+  <button type="button" name="ordenarbtn" *ngIf="relatorio.discrepantes.length > 1"
+          (click)="ordenarPorDiscrepancia()">Ordenar por discrepância decrescente</button>
+
   <table name="listadiscrepantes" *ngIf="relatorio.discrepantes.length > 0">
     <tr>
       <th>Aluno</th>
