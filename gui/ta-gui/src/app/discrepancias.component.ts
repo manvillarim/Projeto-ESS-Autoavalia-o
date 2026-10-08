@@ -16,6 +16,8 @@ export class DiscrepanciasComponent {
    aba: string = "lista";
    distribuicao: any[] = [];
    notificacoes: any[] = [];
+   novoLimiar: number = 0;
+   private ordenado: boolean = false;
 
    abrir(): void {
       this.buscar(false);
@@ -51,9 +53,16 @@ export class DiscrepanciasComponent {
       return this.discrepanciaService.urlDoCsv(this.relatorio.turma);
    }
 
+   alterarLimiar(): void {
+      this.discrepanciaService.definirLimiar(this.nomeDaTurma, this.novoLimiar)
+         .then(() => this.buscar(this.ordenado))
+         .catch(erro => this.erro = erro);
+   }
+
    private buscar(ordenado: boolean): void {
+      this.ordenado = ordenado;
       this.discrepanciaService.getDiscrepancias(this.nomeDaTurma, ordenado)
-         .then(relatorio => { this.relatorio = relatorio; this.erro = null; this.aba = "lista"; this.buscarNotificacoes(); })
+         .then(relatorio => { this.relatorio = relatorio; this.novoLimiar = relatorio.limiar; this.erro = null; this.aba = "lista"; this.buscarNotificacoes(); })
          .catch(erro => { this.relatorio = null; this.erro = erro; });
    }
 }

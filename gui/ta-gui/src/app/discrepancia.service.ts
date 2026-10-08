@@ -1,9 +1,10 @@
 import { Injectable }    from '@angular/core';
-import { Http }          from '@angular/http';
+import { Http, Headers } from '@angular/http';
 
 @Injectable()
 export class DiscrepanciaService {
 
+  private headers = new Headers({'Content-Type': 'application/json'});
   private taURL = 'http://localhost:3000';
 
   constructor(private http: Http) { }
@@ -27,6 +28,14 @@ export class DiscrepanciaService {
     return this.http.get(this.taURL + "/turma/" + encodeURIComponent(turma) + "/notificacoes")
              .toPromise()
              .then(res => res.json().notificacoes)
+             .catch(erro => this.tratarErro(erro));
+  }
+
+  definirLimiar(turma: string, limiar: number): Promise<any> {
+    return this.http.put(this.taURL + "/turma/" + encodeURIComponent(turma) + "/limiar",
+                         JSON.stringify({limiar: limiar}), {headers: this.headers})
+             .toPromise()
+             .then(res => res.json())
              .catch(erro => this.tratarErro(erro));
   }
 

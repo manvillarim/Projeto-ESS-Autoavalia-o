@@ -149,4 +149,32 @@ describe("O servidor", () => {
         .then(body => expect(body.notificacoes[0].nome).toBe("Carlos"));
   })
 
+  it("recalcula as discrepâncias com o novo limiar da turma, e recusa um limiar inválido", () => {
+    var turma = base_url + "turma/" + encodeURIComponent("Turma Limiar");
+    var meta = "Write quality tests";
+    return request.put(turma, {"json": {"metas": [meta], "limiar": 1}})
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Pedro", "cpf": "60"}}))
+        .then(() => request.put(turma + "/professor/60", {"json": {"meta": meta, "conceito": "MPA"}}))
+        .then(() => request.put(turma + "/autoavaliacao/60", {"json": {"meta": meta, "conceito": "MA"}}))
+        .then(() => request.get(turma + "/discrepancias", {"json": true}))
+        .then(body => {
+            expect(body.discrepantes).toEqual([]);
+            return request.put(turma + "/limiar", {"json": {"limiar": 0}});
+        })
+        .then(body => {
+            expect(body).toEqual({success: "O limiar de discrepância foi atualizado com sucesso"});
+            return request.get(turma + "/discrepancias", {"json": true});
+        })
+        .then(body => {
+            expect(body.limiar).toBe(0);
+            expect(body.discrepantes[0].nome).toBe("Pedro");
+            return request.put(turma + "/limiar", {"json": {"limiar": -1}});
+        })
+        .then(body => fail("o servidor deveria ter recusado o limiar -1, mas respondeu " + JSON.stringify(body)),
+              e => {
+            expect(e.statusCode).toBe(400);
+            expect(e.error.failure).toContain("limiar");
+        });
+  })
+
 })

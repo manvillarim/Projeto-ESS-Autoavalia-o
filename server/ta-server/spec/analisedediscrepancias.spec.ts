@@ -191,4 +191,22 @@ describe("A análise de discrepâncias", () => {
       expect(vazia.distribuicao()).toEqual([]);
     })
   })
+
+  describe("quando o limiar da turma é alterado", () => {
+    beforeEach(() => {
+      turma.definirLimiarDeDiscrepancia(2);
+      matriculada.matricular("Pedro", "10");
+      atribuir("professor", "10", ["MPA", "MPA"]); atribuir("aluno", "10", ["MA", "MA"]);
+    })
+
+    it("recalcula a lista de discrepantes com o novo limiar", () => {
+      expect(analise.relatorio().discrepantes.map(d => d.aluno.nome)).not.toContain("Pedro");
+
+      matriculada.alterarLimiar(1);
+      var relatorio = analise.relatorio();
+
+      expect(relatorio.limiar).toBe(1);
+      expect(relatorio.discrepantes.map(d => d.aluno.nome)).toContain("Pedro");
+    })
+  })
 })

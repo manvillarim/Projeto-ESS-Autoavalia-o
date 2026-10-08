@@ -223,6 +223,15 @@ defineSupportCode(function ({ Given, When, Then }) {
         await $("button[name='abadistribuicao']").click();
     });
 
+    When(/^I change the discrepancy threshold to "(\d*)"$/, async (limiar: any) => {
+        // A página já mostra a turma do cenário, com o limiar anterior, antes de o limiar ser alterado.
+        await abrirDiscrepancias(ultimaTurma);
+        let campo = $("input[name='limiarbox']");
+        await campo.clear();
+        await campo.sendKeys(limiar);
+        await $("button[name='alterarlimiarbtn']").click();
+    });
+
     When(/^I sort the list of discrepant students by decreasing discrepancy$/, async () => {
         await $("button[name='ordenarbtn']").click();
     });
@@ -283,6 +292,14 @@ defineSupportCode(function ({ Given, When, Then }) {
 
     Then(/^I see the list of discrepant students empty$/, async () => {
         await expect(element.all(by.name('discrepante')).count()).to.eventually.equal(0);
+    });
+
+    Then(/^the list of discrepant students is recomputed using the new threshold of "(\d*)"$/, async (limiar: any) => {
+        await expect($("span[name='limiar']").getText()).to.eventually.equal(limiar);
+    });
+
+    Then(/^"([^\"]*)" starts to appear in the list of discrepant students$/, async (aluno: any) => {
+        await expect(linhaDo(aluno).count()).to.eventually.equal(1);
     });
 
     Then(/^I do not see "([^\"]*)" in the list of discrepant students$/, async (aluno: any) => {

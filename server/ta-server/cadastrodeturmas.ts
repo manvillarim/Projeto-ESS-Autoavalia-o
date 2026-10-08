@@ -1,4 +1,5 @@
 import { Turma } from '../../gui/ta-gui/src/app/turma';
+import { Resultado } from '../../gui/ta-gui/src/app/resultado';
 import { CadastroDeAutoavaliacoes } from './cadastrodeautoavaliacoes';
 
 // Um aluno matriculado em uma turma, identificado pelo CPF.
@@ -21,6 +22,15 @@ export class TurmaMatriculada {
 
   matricular(nome: string, cpf: string): void {
     this.matriculados.push(new Matriculado(nome, cpf));
+  }
+
+  // O limiar é o maior valor de discrepância ainda aceito, então deve ser um inteiro não negativo.
+  alterarLimiar(limiar: any): Resultado {
+    if (typeof limiar !== "number" || !Number.isInteger(limiar) || limiar < 0) {
+      return Resultado.falha('O limiar "' + limiar + '" não é válido; deve ser um número inteiro maior ou igual a zero');
+    }
+    this.turma.definirLimiarDeDiscrepancia(limiar);
+    return Resultado.sucesso();
   }
 
   getMatriculados(): Matriculado[] {

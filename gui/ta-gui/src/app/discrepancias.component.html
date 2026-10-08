@@ -11,6 +11,12 @@
     <p name="notificacao" *ngFor="let n of notificacoes">{{n.mensagem}}</p>
   </div>
 
+  <div>
+    <label>Novo limiar:</label>
+    <input type="number" min="0" step="1" name="limiarbox" [(ngModel)]="novoLimiar">
+    <button type="button" name="alterarlimiarbtn" (click)="alterarLimiar()">Alterar limiar</button>
+  </div>
+
   <button type="button" name="abalista" (click)="mostrarLista()">Discrepant students</button>
   <button type="button" name="abadistribuicao" (click)="mostrarDistribuicao()">Discrepancy distribution</button>
 
@@ -27,7 +33,8 @@
 
   <div name="listadealunos" *ngIf="aba === 'lista'">
     <p>Alunos discrepantes: <span name="quantidade">{{relatorio.quantidadeDeDiscrepantes}}</span></p>
-    <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>
+    <p>Limiar de discrepância: <span name="limiar">{{relatorio.limiar}}</span></p>
+  <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>
 
     <p name="listavazia" *ngIf="relatorio.discrepantes.length === 0">Nenhum aluno discrepante nesta turma.</p>
 

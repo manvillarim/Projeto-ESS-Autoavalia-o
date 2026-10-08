@@ -136,6 +136,17 @@ app.get('/turma/:nome/notificacoes', function (req: express.Request, res: expres
   res.send({"notificacoes": notificadorDe(req.params.nome, matriculada).getNotificacoes()});
 })
 
+app.put('/turma/:nome/limiar', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  var resultado: Resultado = matriculada.alterarLimiar(req.body.limiar);
+  if (resultado.sucedeu()) {
+    res.send({"success": "O limiar de discrepância foi atualizado com sucesso"});
+  } else {
+    res.status(400).send({"failure": resultado.getErro()});
+  }
+})
+
 // Stubs das funcionalidades de turma e de conceitos do professor, de outros membros
 // da equipe: permitem montar a situação de uma turma para os testes de aceitação.
 app.put('/turma/:nome', function (req: express.Request, res: express.Response) {
