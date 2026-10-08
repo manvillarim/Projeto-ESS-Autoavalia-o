@@ -22,6 +22,10 @@ export class DiscrepanciasComponent {
       this.buscar(true);
    }
 
+   urlDoCsv(): string {
+      return this.discrepanciaService.urlDoCsv(this.relatorio.turma);
+   }
+
    private buscar(ordenado: boolean): void {
       this.discrepanciaService.getDiscrepancias(this.nomeDaTurma, ordenado)
          .then(relatorio => { this.relatorio = relatorio; this.erro = null; })

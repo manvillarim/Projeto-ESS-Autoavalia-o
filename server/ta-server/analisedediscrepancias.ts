@@ -83,6 +83,33 @@ export class AnaliseDeDiscrepancias {
                                         matriculados.length, discrepantes, naoCalculaveis);
   }
 
+  // Uma linha por aluno discrepante do relatório, com os conceitos do professor e do aluno
+  // em cada meta da turma e a discrepância.
+  comoCsv(relatorio: RelatorioDeDiscrepancias): string {
+    var metas: string[] = this.turma.getTurma().getMetas();
+    var cabecalho: string[] = ["Student", "CPF"];
+    for (var meta of metas) {
+      cabecalho.push("Professor: " + meta, "Student: " + meta);
+    }
+    cabecalho.push("Discrepancy");
+
+    var linhas: string[][] = [cabecalho];
+    for (var discrepante of relatorio.discrepantes) {
+      var linha: string[] = [discrepante.aluno.nome, discrepante.aluno.cpf];
+      for (var meta of metas) {
+        linha.push(discrepante.conceitosDoProfessor[meta], discrepante.conceitosDoAluno[meta]);
+      }
+      linha.push(String(discrepante.discrepancia));
+      linhas.push(linha);
+    }
+    return linhas.map(l => l.map(AnaliseDeDiscrepancias.campoCsv).join(",")).join("\r\n") + "\r\n";
+  }
+
+  // Campos com vírgula, aspas ou quebra de linha vão entre aspas, e as aspas internas são dobradas.
+  private static campoCsv(valor: string): string {
+    return /[",\r\n]/.test(valor) ? '"' + valor.replace(/"/g, '""') + '"' : valor;
+  }
+
   private conceitosDe(autoavaliacao: Autoavaliacao): { [meta: string]: string } {
     var conceitos: { [meta: string]: string } = {};
     for (var meta of this.turma.getTurma().getMetas()) {

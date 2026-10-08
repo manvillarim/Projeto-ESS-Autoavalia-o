@@ -22,6 +22,15 @@ let chamar = ((metodo: string, caminho: string, corpo?: any) => new Promise<any>
     req.end();
 }));
 
+// Baixa o arquivo de um endereço, o que o navegador faz ao seguir o link de exportação.
+let baixar = ((url: string) => new Promise<any>((resolve, reject) => {
+    http.get(url, res => {
+        let texto = '';
+        res.on('data', pedaco => texto += pedaco);
+        res.on('end', () => resolve({ tipo: res.headers['content-type'], texto: texto }));
+    }).on('error', reject);
+}));
+
 let caminhoDaTurma = ((turma: string) => '/turma/' + encodeURIComponent(turma));
 
 // O que os cenários já disseram sobre cada turma, para recriá-la no servidor
@@ -35,6 +44,8 @@ let turmas: { [nome: string]: EstadoDaTurma } = {};
 let nextCpf = 1000;
 // Turma da página em que o cenário está; os passos de conceitos não repetem o nome da turma.
 let ultimaTurma: string;
+// Arquivo recebido ao exportar, para os passos seguintes conferirem o conteúdo.
+let arquivo: any;
 
 let estadoDe = ((turma: string) => turmas[turma] = turmas[turma] || new EstadoDaTurma());
 
@@ -150,7 +161,24 @@ defineSupportCode(function ({ Given, When, Then }) {
         }
     });
 
+    Given(/^"([^\"]*)" has discrepant students$/, async (turma: any) => {
+        await garantirMetas(turma);
+        estadoDe(turma).limiar = 1;
+        await publicar(turma);
+        let divergente = estadoDe(turma).metas.map(() => "MANA").join(', ');
+        await atribuir('professor', turma, "Carlos", divergente);
+        await atribuir('autoavaliacao', turma, "Carlos", estadoDe(turma).metas.map(() => "MA").join(', '));
+    });
+
     When(/^I open the discrepancies page of "([^\"]*)"$/, abrirDiscrepancias);
+
+    When(/^I click on "Export to CSV"$/, async () => {
+        arquivo = null;
+        let link = $("a[name='exportarcsv']");
+        let url = await link.getAttribute('href');
+        await link.click();
+        arquivo = await baixar(url);
+    });
 
     When(/^I sort the list of discrepant students by decreasing discrepancy$/, async () => {
         await $("button[name='ordenarbtn']").click();
@@ -182,6 +210,14 @@ defineSupportCode(function ({ Given, When, Then }) {
     Then(/^I see the discrepant students in the order (.*)$/, async (ordem: any) => {
         let nomes = element.all(by.name('nomediscrepante')).map(e => e.getText());
         await expect(nomes).to.eventually.deep.equal(nomesEntreAspas(ordem));
+    });
+
+    Then(/^I receive a CSV file containing the discrepant students, the concepts of each goal and their discrepancies$/, async () => {
+        expect(arquivo.tipo).to.contain('text/csv');
+        let linhas: string[] = arquivo.texto.split('\r\n');
+        expect(linhas[0]).to.contain('Student').and.to.contain('Discrepancy');
+        expect(linhas[0]).to.contain('Professor: ' + estadoDe(ultimaTurma).metas[0]);
+        expect(linhas[1]).to.match(/^Carlos,\d+,MANA,MA(,MANA,MA)*,\d+$/);
     });
 
     Then(/^I see an error message stating that the class was not found$/, async () => {

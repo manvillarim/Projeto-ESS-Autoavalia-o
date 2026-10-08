@@ -106,4 +106,19 @@ describe("O servidor", () => {
         .then(body => expect(body.discrepantes.map((d: any) => d.nome)).toEqual(["Carlos", "Rafael"]));
   })
 
+  it("exporta os alunos discrepantes de uma turma em um arquivo CSV", () => {
+    var turma = base_url + "turma/" + encodeURIComponent("Turma CSV");
+    var meta = "Write quality tests";
+    return request.put(turma, {"json": {"metas": [meta], "limiar": 0}})
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Carlos", "cpf": "30"}}))
+        .then(() => request.put(turma + "/professor/30", {"json": {"meta": meta, "conceito": "MANA"}}))
+        .then(() => request.put(turma + "/autoavaliacao/30", {"json": {"meta": meta, "conceito": "MA"}}))
+        .then(() => request.get(turma + "/discrepancias/csv", {resolveWithFullResponse: true}))
+        .then(resposta => {
+            expect(resposta.headers["content-type"]).toContain("text/csv");
+            expect(resposta.headers["content-disposition"]).toContain("attachment");
+            expect(resposta.body).toContain("Carlos,30,MANA,MA,2\r\n");
+        });
+  })
+
 })

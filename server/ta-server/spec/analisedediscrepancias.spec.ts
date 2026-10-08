@@ -146,4 +146,29 @@ describe("A análise de discrepâncias", () => {
       expect(relatorio.discrepantes.map(d => d.aluno.nome)).toEqual(["Carlos", "Rafael", "Zeca"]);
     })
   })
+
+  describe("ao exportar os alunos discrepantes para CSV", () => {
+    it("escreve o cabeçalho e uma linha por aluno discrepante, com os conceitos de cada meta", () => {
+      var linhas = analise.comoCsv(analise.relatorio()).split("\r\n");
+
+      expect(linhas[0]).toBe("Student,CPF,Professor: " + ESPECIFICAR + ",Student: " + ESPECIFICAR
+                             + ",Professor: " + TESTES + ",Student: " + TESTES + ",Discrepancy");
+      expect(linhas[1]).toBe("Carlos,1,MANA,MA,MANA,MA,4");
+      expect(linhas[2]).toBe("Rafael,3,MPA,MA,MANA,MPA,2");
+      expect(linhas.length).toBe(4);
+    })
+
+    it("escreve só o cabeçalho quando não há alunos discrepantes", () => {
+      turma.definirLimiarDeDiscrepancia(10);
+
+      expect(analise.comoCsv(analise.relatorio()).split("\r\n").length).toBe(2);
+    })
+
+    it("protege vírgulas e aspas no nome do aluno", () => {
+      matriculada.matricular('Silva, "Zé"', "9");
+      atribuir("professor", "9", ["MANA", "MANA"]); atribuir("aluno", "9", ["MA", "MA"]);
+
+      expect(analise.comoCsv(analise.relatorio())).toContain('"Silva, ""Zé""",9,');
+    })
+  })
 })

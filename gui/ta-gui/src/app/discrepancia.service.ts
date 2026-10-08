@@ -16,6 +16,10 @@ export class DiscrepanciaService {
              .catch(erro => this.tratarErro(erro));
   }
 
+  urlDoCsv(turma: string): string {
+    return this.taURL + "/turma/" + encodeURIComponent(turma) + "/discrepancias/csv";
+  }
+
   // Prefere o motivo informado pelo servidor (por exemplo, turma não encontrada)
   // à mensagem genérica de falha de acesso.
   private tratarErro(erro: any): Promise<any>{
