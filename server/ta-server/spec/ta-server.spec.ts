@@ -177,4 +177,15 @@ describe("O servidor", () => {
         });
   })
 
+  it("recusa uma ordem desconhecida para a lista de alunos discrepantes", () => {
+    var turma = base_url + "turma/" + encodeURIComponent("Turma Ordem Invalida");
+    return request.put(turma, {"json": {"metas": ["Write quality tests"], "limiar": 0}})
+        .then(() => request.get(turma + "/discrepancias?ordem=aleatoria", {"json": true}))
+        .then(body => fail("o servidor deveria ter recusado a ordem, mas respondeu " + JSON.stringify(body)),
+              e => {
+            expect(e.statusCode).toBe(400);
+            expect(e.error.failure).toContain("aleatoria");
+        });
+  })
+
 })

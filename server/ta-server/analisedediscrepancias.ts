@@ -124,7 +124,10 @@ export class AnaliseDeDiscrepancias {
   }
 
   // Campos com vírgula, aspas ou quebra de linha vão entre aspas, e as aspas internas são dobradas.
+  // Campos iniciados por =, +, - ou @ ganham um apóstrofo na frente, para que planilhas não os
+  // executem como fórmulas quando o nome de um aluno é malicioso.
   private static campoCsv(valor: string): string {
+    if (/^[=+\-@]/.test(valor)) valor = "'" + valor;
     return /[",\r\n]/.test(valor) ? '"' + valor.replace(/"/g, '""') + '"' : valor;
   }
 

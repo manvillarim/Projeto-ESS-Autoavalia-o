@@ -87,8 +87,12 @@ app.delete('/autoavaliacao/:cpf/:meta', function (req: express.Request, res: exp
 app.get('/turma/:nome/discrepancias', function (req: express.Request, res: express.Response) {
   var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
   if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  var ordem = req.query.ordem;
+  if (ordem !== undefined && ordem !== 'discrepancia-decrescente') {
+    return res.status(400).send({"failure": 'A ordem "' + ordem + '" não é válida; a ordem aceita é discrepancia-decrescente'});
+  }
   var relatorio = new AnaliseDeDiscrepancias(matriculada).relatorio();
-  if (req.query.ordem === 'discrepancia-decrescente') relatorio = relatorio.ordenadoPorDiscrepanciaDecrescente();
+  if (ordem === 'discrepancia-decrescente') relatorio = relatorio.ordenadoPorDiscrepanciaDecrescente();
   res.send({"turma": relatorio.turma, "limiar": relatorio.limiar,
             "totalDeAlunos": relatorio.totalDeAlunos,
             "quantidadeDeDiscrepantes": relatorio.quantidadeDeDiscrepantes(),

@@ -164,6 +164,13 @@ describe("A análise de discrepâncias", () => {
       expect(analise.comoCsv(analise.relatorio()).split("\r\n").length).toBe(2);
     })
 
+    it("impede que o nome de um aluno seja executado como fórmula de planilha", () => {
+      matriculada.matricular("=HYPERLINK(\"http://exemplo.com\")", "11");
+      atribuir("professor", "11", ["MANA", "MANA"]); atribuir("aluno", "11", ["MA", "MA"]);
+
+      expect(analise.comoCsv(analise.relatorio())).toContain("\"'=HYPERLINK(\"\"http://exemplo.com\"\")\",11,");
+    })
+
     it("protege vírgulas e aspas no nome do aluno", () => {
       matriculada.matricular('Silva, "Zé"', "9");
       atribuir("professor", "9", ["MANA", "MANA"]); atribuir("aluno", "9", ["MA", "MA"]);
