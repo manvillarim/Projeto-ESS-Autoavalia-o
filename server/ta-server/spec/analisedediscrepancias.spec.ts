@@ -97,4 +97,23 @@ describe("A análise de discrepâncias", () => {
       expect(relatorio.percentualDeDiscrepantes()).toBe(50);
     })
   })
+
+  describe("quando a discrepância é exatamente igual ao limiar", () => {
+    beforeEach(() => {
+      turma.definirLimiarDeDiscrepancia(2);
+      matriculada.matricular("João", "6");
+      atribuir("professor", "6", ["MPA", "MANA"]); atribuir("aluno", "6", ["MA", "MPA"]);
+    })
+
+    it("não considera o aluno discrepante", () => {
+      expect(analise.discrepanciaDe("6").getValor()).toBe(2);
+      expect(analise.relatorio().discrepantes.map(d => d.aluno.nome)).not.toContain("João");
+    })
+
+    it("passa a considerar o aluno discrepante quando o limiar diminui", () => {
+      turma.definirLimiarDeDiscrepancia(1);
+
+      expect(analise.relatorio().discrepantes.map(d => d.aluno.nome)).toContain("João");
+    })
+  })
 })
