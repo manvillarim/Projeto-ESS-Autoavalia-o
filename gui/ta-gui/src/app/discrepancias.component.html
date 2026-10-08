@@ -4,6 +4,8 @@
   <button type="button" name="abrirbtn" (click)="abrir()">Abrir</button>
 </div>
 
+<p name="erro" *ngIf="erro">{{erro}}</p>
+
 <div *ngIf="relatorio">
   <p>Alunos discrepantes: <span name="quantidade">{{relatorio.quantidadeDeDiscrepantes}}</span></p>
   <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>

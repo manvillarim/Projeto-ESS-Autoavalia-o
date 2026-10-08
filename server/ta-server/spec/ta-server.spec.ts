@@ -83,4 +83,13 @@ describe("O servidor", () => {
         });
   })
 
+  it("informa que a turma não foi encontrada ao consultar as discrepâncias de uma turma inexistente", () => {
+    return request.get(base_url + "turma/" + encodeURIComponent("Turma Z") + "/discrepancias", {"json": true}).then(body =>
+        fail("o servidor deveria ter recusado a turma inexistente, mas respondeu " + JSON.stringify(body))
+    ).catch(e => {
+        expect(e.statusCode).toBe(404);
+        expect(e.error.failure).toBe('A turma "Turma Z" não foi encontrada');
+    })
+  })
+
 })

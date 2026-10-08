@@ -12,10 +12,11 @@ export class DiscrepanciasComponent {
 
    nomeDaTurma: string = "";
    relatorio: any = null;
+   erro: string = null;
 
    abrir(): void {
       this.discrepanciaService.getDiscrepancias(this.nomeDaTurma)
-         .then(relatorio => this.relatorio = relatorio)
-         .catch(erro => alert(erro));
+         .then(relatorio => { this.relatorio = relatorio; this.erro = null; })
+         .catch(erro => { this.relatorio = null; this.erro = erro; });
    }
 }

@@ -12,11 +12,15 @@ export class DiscrepanciaService {
     return this.http.get(this.taURL + "/turma/" + encodeURIComponent(turma) + "/discrepancias")
              .toPromise()
              .then(res => res.json())
-             .catch(this.tratarErro);
+             .catch(erro => this.tratarErro(erro));
   }
 
+  // Prefere o motivo informado pelo servidor (por exemplo, turma não encontrada)
+  // à mensagem genérica de falha de acesso.
   private tratarErro(erro: any): Promise<any>{
     console.error('Acesso mal sucedido ao serviço de discrepâncias',erro);
-    return Promise.reject(erro.message || erro);
+    var motivo: string = null;
+    try { motivo = erro.json().failure; } catch (e) { }
+    return Promise.reject(motivo || erro.message || erro);
   }
 }

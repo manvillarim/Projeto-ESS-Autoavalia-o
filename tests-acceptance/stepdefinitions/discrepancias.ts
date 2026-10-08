@@ -67,6 +67,11 @@ let nomesEntreAspas = ((texto: string) => (texto.match(/"([^"]*)"/g) || []).map(
 let linhaDo = ((aluno: string) => element.all(by.name('discrepante'))
                                          .filter(e => e.element(by.name('nomediscrepante')).getText().then(t => t === aluno)));
 
+let abrirDiscrepancias = (async (turma: string) => {
+    await $("input[name='turmabox']").sendKeys(turma);
+    await $("button[name='abrirbtn']").click();
+});
+
 defineSupportCode(function ({ Given, When, Then }) {
     Given(/^I am on the discrepancies page of the class "([^\"]*)"$/, async (turma: any) => {
         ultimaTurma = turma;
@@ -116,15 +121,23 @@ defineSupportCode(function ({ Given, When, Then }) {
         await atribuir('autoavaliacao', turma, "Student at the limit", doAluno.join(', '));
     });
 
-    When(/^I open the discrepancies page of "([^\"]*)"$/, async (turma: any) => {
-        await $("input[name='turmabox']").sendKeys(<string> turma);
-        await $("button[name='abrirbtn']").click();
+    Given(/^the class "([^\"]*)" does not exist$/, async (turma: any) => {
+        // O servidor só conhece as turmas que os passos cadastram; basta não cadastrar esta.
+        delete turmas[turma];
     });
+
+    When(/^I open the discrepancies page of "([^\"]*)"$/, abrirDiscrepancias);
+
+    When(/^I try to open the discrepancies page of the class "([^\"]*)"$/, abrirDiscrepancias);
 
     Then(/^I see "([^\"]*)" in the list of discrepant students with the discrepancy "(\d*)"$/, async (aluno: any, valor: any) => {
         let linhas = linhaDo(aluno);
         await expect(linhas.count()).to.eventually.equal(1);
         await expect(linhas.first().element(by.name('valordiscrepancia')).getText()).to.eventually.equal(valor);
+    });
+
+    Then(/^I see an error message stating that the class was not found$/, async () => {
+        await expect($("p[name='erro']").getText()).to.eventually.contain('não foi encontrada');
     });
 
     Then(/^I see the list of discrepant students empty$/, async () => {
