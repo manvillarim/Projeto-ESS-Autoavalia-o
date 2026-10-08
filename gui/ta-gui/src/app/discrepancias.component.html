@@ -7,29 +7,45 @@
 <p name="erro" *ngIf="erro">{{erro}}</p>
 
 <div *ngIf="relatorio">
-  <p>Alunos discrepantes: <span name="quantidade">{{relatorio.quantidadeDeDiscrepantes}}</span></p>
-  <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>
+  <button type="button" name="abalista" (click)="mostrarLista()">Discrepant students</button>
+  <button type="button" name="abadistribuicao" (click)="mostrarDistribuicao()">Discrepancy distribution</button>
 
-  <p name="listavazia" *ngIf="relatorio.discrepantes.length === 0">Nenhum aluno discrepante nesta turma.</p>
+  <div name="graficodistribuicao" *ngIf="aba === 'distribuicao'">
+    <p *ngIf="distribuicao.length === 0">Nenhum aluno com discrepância calculada.</p>
+    <div class="grafico">
+      <div class="coluna" name="barra" *ngFor="let faixa of distribuicao">
+        <span name="quantidadebarra">{{faixa.quantidade}}</span>
+        <div class="barra" [style.height.%]="alturaDaBarra(faixa.quantidade)"></div>
+        <span name="rotulobarra">{{faixa.discrepancia}}</span>
+      </div>
+    </div>
+  </div>
 
-  <button type="button" name="ordenarbtn" *ngIf="relatorio.discrepantes.length > 1"
-          (click)="ordenarPorDiscrepancia()">Ordenar por discrepância decrescente</button>
+  <div name="listadealunos" *ngIf="aba === 'lista'">
+    <p>Alunos discrepantes: <span name="quantidade">{{relatorio.quantidadeDeDiscrepantes}}</span></p>
+    <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>
 
-  <a name="exportarcsv" [href]="urlDoCsv()" download>Export to CSV</a>
+    <p name="listavazia" *ngIf="relatorio.discrepantes.length === 0">Nenhum aluno discrepante nesta turma.</p>
 
-  <table name="listadiscrepantes" *ngIf="relatorio.discrepantes.length > 0">
-    <tr>
-      <th>Aluno</th>
-      <th>Discrepância</th>
-    </tr>
-    <tr name="discrepante" *ngFor="let d of relatorio.discrepantes">
-      <td name="nomediscrepante">{{d.nome}}</td>
-      <td name="valordiscrepancia">{{d.discrepancia}}</td>
-    </tr>
-  </table>
+    <button type="button" name="ordenarbtn" *ngIf="relatorio.discrepantes.length > 1"
+            (click)="ordenarPorDiscrepancia()">Ordenar por discrepância decrescente</button>
 
-  <div name="naocalculavel" *ngFor="let n of relatorio.naoCalculaveis">
-    <p>Não foi possível calcular a discrepância de {{n.nome}}: {{n.motivo}}.</p>
-    <p name="sugestao">Atribua os conceitos pendentes de {{n.nome}} para calcular a discrepância.</p>
+    <a name="exportarcsv" [href]="urlDoCsv()" download>Export to CSV</a>
+
+    <table name="listadiscrepantes" *ngIf="relatorio.discrepantes.length > 0">
+      <tr>
+        <th>Aluno</th>
+        <th>Discrepância</th>
+      </tr>
+      <tr name="discrepante" *ngFor="let d of relatorio.discrepantes">
+        <td name="nomediscrepante">{{d.nome}}</td>
+        <td name="valordiscrepancia">{{d.discrepancia}}</td>
+      </tr>
+    </table>
+
+    <div name="naocalculavel" *ngFor="let n of relatorio.naoCalculaveis">
+      <p>Não foi possível calcular a discrepância de {{n.nome}}: {{n.motivo}}.</p>
+      <p name="sugestao">Atribua os conceitos pendentes de {{n.nome}} para calcular a discrepância.</p>
+    </div>
   </div>
 </div>

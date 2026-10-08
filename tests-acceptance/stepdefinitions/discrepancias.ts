@@ -44,6 +44,8 @@ let turmas: { [nome: string]: EstadoDaTurma } = {};
 let nextCpf = 1000;
 // Turma da página em que o cenário está; os passos de conceitos não repetem o nome da turma.
 let ultimaTurma: string;
+// Distribuição que o cenário montou, como pares [discrepância, quantidade de alunos].
+let distribuicaoEsperada: number[][];
 // Arquivo recebido ao exportar, para os passos seguintes conferirem o conteúdo.
 let arquivo: any;
 
@@ -170,6 +172,21 @@ defineSupportCode(function ({ Given, When, Then }) {
         await atribuir('autoavaliacao', turma, "Carlos", estadoDe(turma).metas.map(() => "MA").join(', '));
     });
 
+    Given(/^"([^\"]*)" has students with different levels of discrepancy$/, async (turma: any) => {
+        await garantirMetas(turma);
+        let metas = estadoDe(turma).metas;
+        // O professor atribui MA em todas as metas; a divergência de cada aluno está só na primeira meta.
+        let alunos: [string, string][] = [["Student zero", "MA"], ["Student one", "MPA"],
+                                          ["Student another one", "MPA"], ["Student two", "MANA"]];
+        let divergencia: { [conceito: string]: number } = { "MA": 0, "MPA": 1, "MANA": 2 };
+        distribuicaoEsperada = [[0, 0], [1, 0], [2, 0]];
+        for (let [aluno, conceito] of alunos) {
+            await atribuir('professor', turma, aluno, metas.map(() => "MA").join(', '));
+            await atribuir('autoavaliacao', turma, aluno, [conceito].concat(metas.slice(1).map(() => "MA")).join(', '));
+            distribuicaoEsperada[divergencia[conceito]][1]++;
+        }
+    });
+
     When(/^I open the discrepancies page of "([^\"]*)"$/, abrirDiscrepancias);
 
     When(/^I click on "Export to CSV"$/, async () => {
@@ -178,6 +195,10 @@ defineSupportCode(function ({ Given, When, Then }) {
         let url = await link.getAttribute('href');
         await link.click();
         arquivo = await baixar(url);
+    });
+
+    When(/^I open the "Discrepancy distribution" tab$/, async () => {
+        await $("button[name='abadistribuicao']").click();
     });
 
     When(/^I sort the list of discrepant students by decreasing discrepancy$/, async () => {
@@ -218,6 +239,14 @@ defineSupportCode(function ({ Given, When, Then }) {
         expect(linhas[0]).to.contain('Student').and.to.contain('Discrepancy');
         expect(linhas[0]).to.contain('Professor: ' + estadoDe(ultimaTurma).metas[0]);
         expect(linhas[1]).to.match(/^Carlos,\d+,MANA,MA(,MANA,MA)*,\d+$/);
+    });
+
+    Then(/^I see a chart with the number of students grouped by discrepancy$/, async () => {
+        let barras = element.all(by.name('barra'));
+        let rotulos = barras.map(b => b.element(by.name('rotulobarra')).getText());
+        let quantidades = barras.map(b => b.element(by.name('quantidadebarra')).getText());
+        await expect(rotulos).to.eventually.deep.equal(distribuicaoEsperada.map(f => String(f[0])));
+        await expect(quantidades).to.eventually.deep.equal(distribuicaoEsperada.map(f => String(f[1])));
     });
 
     Then(/^I see an error message stating that the class was not found$/, async () => {

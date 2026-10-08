@@ -16,6 +16,13 @@ export class DiscrepanciaService {
              .catch(erro => this.tratarErro(erro));
   }
 
+  getDistribuicao(turma: string): Promise<any> {
+    return this.http.get(this.taURL + "/turma/" + encodeURIComponent(turma) + "/discrepancias/distribuicao")
+             .toPromise()
+             .then(res => res.json())
+             .catch(erro => this.tratarErro(erro));
+  }
+
   urlDoCsv(turma: string): string {
     return this.taURL + "/turma/" + encodeURIComponent(turma) + "/discrepancias/csv";
   }

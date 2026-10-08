@@ -171,4 +171,24 @@ describe("A análise de discrepâncias", () => {
       expect(analise.comoCsv(analise.relatorio())).toContain('"Silva, ""Zé""",9,');
     })
   })
+
+  describe("ao calcular a distribuição das discrepâncias da turma", () => {
+    it("conta os alunos por discrepância, inclusive os que não excedem o limiar", () => {
+      var faixas = analise.distribuicao().map(f => [f.discrepancia, f.quantidade]);
+
+      expect(faixas).toEqual([[0, 1], [1, 0], [2, 1], [3, 0], [4, 1]]);
+    })
+
+    it("deixa de fora os alunos cuja discrepância não pôde ser calculada", () => {
+      matriculada.matricular("Maria", "4");
+
+      expect(analise.distribuicao().reduce((total, f) => total + f.quantidade, 0)).toBe(3);
+    })
+
+    it("é vazia quando a turma não tem alunos", () => {
+      var vazia = new AnaliseDeDiscrepancias(new TurmaMatriculada(new Turma("Turma Vazia", [ESPECIFICAR])));
+
+      expect(vazia.distribuicao()).toEqual([]);
+    })
+  })
 })

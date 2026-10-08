@@ -121,4 +121,15 @@ describe("O servidor", () => {
         });
   })
 
+  it("informa a distribuição das discrepâncias de uma turma", () => {
+    var turma = base_url + "turma/" + encodeURIComponent("Turma Distribuicao");
+    var meta = "Write quality tests";
+    return request.put(turma, {"json": {"metas": [meta], "limiar": 0}})
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Ana", "cpf": "40"}}))
+        .then(() => request.put(turma + "/professor/40", {"json": {"meta": meta, "conceito": "MPA"}}))
+        .then(() => request.put(turma + "/autoavaliacao/40", {"json": {"meta": meta, "conceito": "MA"}}))
+        .then(() => request.get(turma + "/discrepancias/distribuicao", {"json": true}))
+        .then(body => expect(body.distribuicao).toEqual([{discrepancia: 0, quantidade: 0}, {discrepancia: 1, quantidade: 1}]));
+  })
+
 })

@@ -98,6 +98,13 @@ app.get('/turma/:nome/discrepancias/csv', function (req: express.Request, res: e
   res.send(analise.comoCsv(analise.relatorio()));
 })
 
+app.get('/turma/:nome/discrepancias/distribuicao', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  res.send({"turma": req.params.nome,
+            "distribuicao": new AnaliseDeDiscrepancias(matriculada).distribuicao()});
+})
+
 // Stubs das funcionalidades de turma e de conceitos do professor, de outros membros
 // da equipe: permitem montar a situação de uma turma para os testes de aceitação.
 app.put('/turma/:nome', function (req: express.Request, res: express.Response) {

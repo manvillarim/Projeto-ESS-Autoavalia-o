@@ -15,6 +15,11 @@ export class AlunoSemDiscrepancia {
   constructor(readonly aluno: Matriculado, readonly motivo: string) {}
 }
 
+// Quantos alunos têm uma dada discrepância.
+export class FaixaDeDiscrepancia {
+  constructor(readonly discrepancia: number, readonly quantidade: number) {}
+}
+
 export class RelatorioDeDiscrepancias {
   constructor(readonly turma: string,
               readonly limiar: number,
@@ -81,6 +86,19 @@ export class AnaliseDeDiscrepancias {
     }
     return new RelatorioDeDiscrepancias(this.turma.getTurma().getNome(), limiar,
                                         matriculados.length, discrepantes, naoCalculaveis);
+  }
+
+  // Número de alunos da turma por valor de discrepância, de 0 até a maior discrepância,
+  // inclusive os valores sem nenhum aluno. Alunos sem discrepância calculável ficam de fora.
+  distribuicao(): FaixaDeDiscrepancia[] {
+    var quantidades: number[] = [];
+    for (var aluno of this.turma.getMatriculados()) {
+      var discrepancia: Discrepancia = this.discrepanciaDe(aluno.cpf);
+      if (!discrepancia.foiCalculada()) continue;
+      while (quantidades.length <= discrepancia.getValor()) quantidades.push(0);
+      quantidades[discrepancia.getValor()]++;
+    }
+    return quantidades.map((quantidade, discrepancia) => new FaixaDeDiscrepancia(discrepancia, quantidade));
   }
 
   // Uma linha por aluno discrepante do relatório, com os conceitos do professor e do aluno
