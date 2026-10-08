@@ -3,6 +3,7 @@
 export class Turma {
   private metas: string[] = [];
   private autoavaliacaoAberta: boolean = true;
+  private limiarDeDiscrepancia: number = 0;
 
   constructor(private readonly nome: string, metas: string[] = []) {
     this.metas = metas.slice();
@@ -30,5 +31,13 @@ export class Turma {
 
   fecharAutoavaliacao(): void {
     this.autoavaliacaoAberta = false;
+  }
+
+  getLimiarDeDiscrepancia(): number {
+    return this.limiarDeDiscrepancia;
+  }
+
+  definirLimiarDeDiscrepancia(limiar: number): void {
+    this.limiarDeDiscrepancia = limiar;
   }
 }

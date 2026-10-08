@@ -1,0 +1,21 @@
+<div>
+  <label>Turma:</label>
+  <input type="text" name="turmabox" [(ngModel)]="nomeDaTurma">
+  <button type="button" name="abrirbtn" (click)="abrir()">Abrir</button>
+</div>
+
+<div *ngIf="relatorio">
+  <p>Alunos discrepantes: <span name="quantidade">{{relatorio.quantidadeDeDiscrepantes}}</span></p>
+  <p>Percentual da turma: <span name="percentual">{{relatorio.percentualDeDiscrepantes}}%</span></p>
+
+  <table name="listadiscrepantes">
+    <tr>
+      <th>Aluno</th>
+      <th>Discrepância</th>
+    </tr>
+    <tr name="discrepante" *ngFor="let d of relatorio.discrepantes">
+      <td name="nomediscrepante">{{d.nome}}</td>
+      <td name="valordiscrepancia">{{d.discrepancia}}</td>
+    </tr>
+  </table>
+</div>

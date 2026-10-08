@@ -7,13 +7,16 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { MetasComponent } from './metas.component';
 import { AlunosComponent } from './alunos.component';
+import { DiscrepanciasComponent } from './discrepancias.component';
 import { AlunoService } from './aluno.service';
+import { DiscrepanciaService } from './discrepancia.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     MetasComponent,
-    AlunosComponent
+    AlunosComponent,
+    DiscrepanciasComponent
   ],
   imports: [
     BrowserModule,
@@ -27,10 +30,14 @@ import { AlunoService } from './aluno.service';
       {
         path: 'alunos',
         component: AlunosComponent
+      },
+      {
+        path: 'discrepancias',
+        component: DiscrepanciasComponent
       }
     ])
   ],
-  providers: [AlunoService],
+  providers: [AlunoService, DiscrepanciaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

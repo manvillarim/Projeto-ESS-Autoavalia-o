@@ -26,4 +26,15 @@ export class Conceito {
   igual(outro: Conceito): boolean {
     return outro != null && this.valor === outro.valor;
   }
+
+  // Posição do conceito na lista ACEITOS, cujos valores são consecutivos na escala
+  // de desempenho; só a distância entre posições importa, não o sentido da escala.
+  private nivel(): number {
+    return Conceito.ACEITOS.indexOf(this.valor);
+  }
+
+  // Número de níveis entre este conceito e o outro, independente de qual é o maior.
+  divergenciaPara(outro: Conceito): number {
+    return Math.abs(this.nivel() - outro.nivel());
+  }
 }

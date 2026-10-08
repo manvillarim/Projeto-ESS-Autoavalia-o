@@ -6,6 +6,8 @@ import {Turma} from '../../gui/ta-gui/src/app/turma';
 import {Resultado} from '../../gui/ta-gui/src/app/resultado';
 import {CadastroDeAlunos} from './cadastrodealunos';
 import {CadastroDeAutoavaliacoes} from './cadastrodeautoavaliacoes';
+import {CadastroDeTurmas, TurmaMatriculada} from './cadastrodeturmas';
+import {AnaliseDeDiscrepancias} from './analisedediscrepancias';
 
 var app = express();
 
@@ -14,6 +16,9 @@ var cadastro: CadastroDeAlunos = new CadastroDeAlunos();
 var turma: Turma = new Turma("ESS 2025.1",
                              ["Specify requirements with quality", "Write quality tests"]);
 var autoavaliacoes: CadastroDeAutoavaliacoes = new CadastroDeAutoavaliacoes(turma);
+
+var turmas: CadastroDeTurmas = new CadastroDeTurmas();
+turmas.adicionar(new TurmaMatriculada(turma, autoavaliacoes));
 
 var allowCrossDomain = function(req: any, res: any, next: any) {
     res.header('Access-Control-Allow-Origin', "*");
@@ -67,6 +72,53 @@ app.put('/autoavaliacao/:cpf', function (req: express.Request, res: express.Resp
 app.delete('/autoavaliacao/:cpf/:meta', function (req: express.Request, res: express.Response) {
   responder(res, autoavaliacoes.removerConceito(req.params.cpf, req.params.meta));
 })
+
+app.get('/turma/:nome/discrepancias', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  var relatorio = new AnaliseDeDiscrepancias(matriculada).relatorio();
+  res.send({"turma": relatorio.turma, "limiar": relatorio.limiar,
+            "totalDeAlunos": relatorio.totalDeAlunos,
+            "quantidadeDeDiscrepantes": relatorio.quantidadeDeDiscrepantes(),
+            "percentualDeDiscrepantes": relatorio.percentualDeDiscrepantes(),
+            "discrepantes": relatorio.discrepantes.map(d => ({"nome": d.aluno.nome, "cpf": d.aluno.cpf,
+                "discrepancia": d.discrepancia, "conceitosDoProfessor": d.conceitosDoProfessor,
+                "conceitosDoAluno": d.conceitosDoAluno})),
+            "naoCalculaveis": relatorio.naoCalculaveis.map(n => ({"nome": n.aluno.nome, "cpf": n.aluno.cpf,
+                "motivo": n.motivo}))});
+})
+
+// Stubs das funcionalidades de turma e de conceitos do professor, de outros membros
+// da equipe: permitem montar a situação de uma turma para os testes de aceitação.
+app.put('/turma/:nome', function (req: express.Request, res: express.Response) {
+  var nova: Turma = new Turma(req.params.nome, req.body.metas);
+  nova.definirLimiarDeDiscrepancia(req.body.limiar);
+  turmas.adicionar(new TurmaMatriculada(nova));
+  res.send({"success": "A turma foi cadastrada com sucesso"});
+})
+
+app.post('/turma/:nome/aluno', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  matriculada.matricular(req.body.nome, req.body.cpf);
+  res.send({"success": "O aluno foi matriculado com sucesso"});
+})
+
+app.put('/turma/:nome/professor/:cpf', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  responder(res, matriculada.getConceitosDoProfessor().registrarConceito(req.params.cpf, req.body.meta, req.body.conceito));
+})
+
+app.put('/turma/:nome/autoavaliacao/:cpf', function (req: express.Request, res: express.Response) {
+  var matriculada: TurmaMatriculada = turmas.turmaDe(req.params.nome);
+  if (!matriculada) return turmaNaoEncontrada(res, req.params.nome);
+  responder(res, matriculada.getAutoavaliacoes().registrarConceito(req.params.cpf, req.body.meta, req.body.conceito));
+})
+
+function turmaNaoEncontrada(res: express.Response, nome: string): void {
+  res.status(404).send({"failure": 'A turma "' + nome + '" não foi encontrada'});
+}
 
 // Traduz um Resultado do domínio para a resposta HTTP, em um único lugar, para
 // que cada rota não repita essa decisão.

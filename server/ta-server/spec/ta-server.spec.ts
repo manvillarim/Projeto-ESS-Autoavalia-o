@@ -64,4 +64,23 @@ describe("O servidor", () => {
      });
   })
 
+  it("lista os alunos discrepantes de uma turma", () => {
+    var metas = ["Specify requirements with quality", "Write quality tests"];
+    var turma = base_url + "turma/" + encodeURIComponent("Turma HTTP");
+    var conceitos = (rota: string, cpf: string, valores: string[]) =>
+        request.put(turma + rota + cpf, {"json": {"meta": metas[0], "conceito": valores[0]}}).then(() =>
+        request.put(turma + rota + cpf, {"json": {"meta": metas[1], "conceito": valores[1]}}));
+    return request.put(turma, {"json": {"metas": metas, "limiar": 1}})
+        .then(() => request.post(turma + "/aluno", {"json": {"nome": "Carlos", "cpf": "10"}}))
+        .then(() => conceitos("/professor/", "10", ["MANA", "MANA"]))
+        .then(() => conceitos("/autoavaliacao/", "10", ["MA", "MA"]))
+        .then(() => request.get(turma + "/discrepancias", {"json": true}))
+        .then(body => {
+            expect(body.quantidadeDeDiscrepantes).toBe(1);
+            expect(body.percentualDeDiscrepantes).toBe(100);
+            expect(body.discrepantes[0].nome).toBe("Carlos");
+            expect(body.discrepantes[0].discrepancia).toBe(4);
+        });
+  })
+
 })
