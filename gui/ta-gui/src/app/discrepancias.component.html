@@ -22,4 +22,9 @@
       <td name="valordiscrepancia">{{d.discrepancia}}</td>
     </tr>
   </table>
+
+  <div name="naocalculavel" *ngFor="let n of relatorio.naoCalculaveis">
+    <p>Não foi possível calcular a discrepância de {{n.nome}}: {{n.motivo}}.</p>
+    <p name="sugestao">Atribua os conceitos pendentes de {{n.nome}} para calcular a discrepância.</p>
+  </div>
 </div>

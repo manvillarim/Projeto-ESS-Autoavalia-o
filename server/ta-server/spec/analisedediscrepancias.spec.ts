@@ -66,4 +66,35 @@ describe("A análise de discrepâncias", () => {
       expect(relatorio.totalDeAlunos).toBe(3);
     })
   })
+
+  describe("quando falta algum conceito para calcular a discrepância", () => {
+    beforeEach(() => {
+      matriculada.matricular("Maria", "4");
+      atribuir("aluno", "4", ["MA", "MA"]);
+    })
+
+    it("não calcula a discrepância de aluno sem conceitos do professor, e explica o motivo", () => {
+      var discrepancia = analise.discrepanciaDe("4");
+
+      expect(discrepancia.foiCalculada()).toBe(false);
+      expect(discrepancia.getMotivo()).toContain("professor");
+    })
+
+    it("não calcula a discrepância de aluno que não atribuiu conceito a alguma meta", () => {
+      matriculada.matricular("Joana", "5");
+      matriculada.getConceitosDoProfessor().registrarConceito("5", ESPECIFICAR, "MA");
+      matriculada.getAutoavaliacoes().registrarConceito("5", TESTES, "MA");
+
+      expect(analise.discrepanciaDe("5").getMotivo()).toContain("aluno");
+    })
+
+    it("não conta o aluno como discrepante, mas o inclui no total da turma", () => {
+      var relatorio = analise.relatorio();
+
+      expect(relatorio.naoCalculaveis.map(n => n.aluno.nome)).toEqual(["Maria"]);
+      expect(relatorio.discrepantes.map(d => d.aluno.nome)).toEqual(["Carlos", "Rafael"]);
+      expect(relatorio.totalDeAlunos).toBe(4);
+      expect(relatorio.percentualDeDiscrepantes()).toBe(50);
+    })
+  })
 })

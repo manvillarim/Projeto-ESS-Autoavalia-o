@@ -62,6 +62,17 @@ let atribuir = (async (quem: string, turma: string, aluno: string, conceitos: st
     }
 });
 
+const METAS_PADRAO = ["Specify requirements with quality", "Write quality tests"];
+
+// Cenários que não descrevem as metas da turma usam as metas padrão.
+let garantirMetas = (async (turma: string) => {
+    let estado = estadoDe(turma);
+    if (estado.metas.length === 0) {
+        estado.metas = METAS_PADRAO.slice();
+        await publicar(turma);
+    }
+});
+
 let nomesEntreAspas = ((texto: string) => (texto.match(/"([^"]*)"/g) || []).map(n => n.replace(/"/g, '')));
 
 let linhaDo = ((aluno: string) => element.all(by.name('discrepante'))
@@ -103,10 +114,7 @@ defineSupportCode(function ({ Given, When, Then }) {
 
     Given(/^every student of "([^\"]*)" has a discrepancy lower than or equal to "(\d*)"$/, async (turma: any, limite: any) => {
         let estado = estadoDe(turma);
-        if (estado.metas.length === 0) {
-            estado.metas = ["Specify requirements with quality", "Write quality tests"];
-            await publicar(turma);
-        }
+        await garantirMetas(turma);
         // Um aluno sem divergência e outro com divergência exatamente igual ao limite.
         let restante = Number(limite);
         let doAluno = estado.metas.map(() => {
@@ -126,6 +134,15 @@ defineSupportCode(function ({ Given, When, Then }) {
         delete turmas[turma];
     });
 
+    Given(/^the student "([^\"]*)" assigned concepts to all the goals of "([^\"]*)"$/, async (aluno: any, turma: any) => {
+        await garantirMetas(turma);
+        await atribuir('autoavaliacao', turma, aluno, estadoDe(turma).metas.map(() => "MA").join(', '));
+    });
+
+    Given(/^the professor did not assign concepts to "([^\"]*)"$/, async (aluno: any) => {
+        await matricular(ultimaTurma, aluno);
+    });
+
     When(/^I open the discrepancies page of "([^\"]*)"$/, abrirDiscrepancias);
 
     When(/^I try to open the discrepancies page of the class "([^\"]*)"$/, abrirDiscrepancias);
@@ -134,6 +151,21 @@ defineSupportCode(function ({ Given, When, Then }) {
         let linhas = linhaDo(aluno);
         await expect(linhas.count()).to.eventually.equal(1);
         await expect(linhas.first().element(by.name('valordiscrepancia')).getText()).to.eventually.equal(valor);
+    });
+
+    Then(/^I see a message stating that the discrepancy of the student "([^\"]*)" could not be computed$/, async (aluno: any) => {
+        let mensagem = element(by.name('naocalculavel'));
+        await expect(mensagem.getText()).to.eventually.contain('Não foi possível calcular a discrepância de ' + aluno);
+    });
+
+    Then(/^"([^\"]*)" is not counted in the number of discrepant students$/, async (aluno: any) => {
+        await expect(linhaDo(aluno).count()).to.eventually.equal(0);
+        let listados = await element.all(by.name('discrepante')).count();
+        await expect($("span[name='quantidade']").getText()).to.eventually.equal(String(listados));
+    });
+
+    Then(/^I see a suggestion to assign the pending concepts of the student "([^\"]*)"$/, async (aluno: any) => {
+        await expect(element(by.name('sugestao')).getText()).to.eventually.contain('Atribua os conceitos pendentes de ' + aluno);
     });
 
     Then(/^I see an error message stating that the class was not found$/, async () => {
