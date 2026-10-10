@@ -38,4 +38,33 @@ describe("O status da auto-avaliação", () => {
 
     expect(cadastro.autoavaliacaoDe(CPF_BRUNO).estaVazia()).toBe(true);
   })
+
+  
+  it("passa a concluída quando o aluno atribui conceito à última meta", () => {
+    cadastro.registrarConceito(CPF_ANA, ESPECIFICAR, "MA");
+    expect(cadastro.statusDe(CPF_ANA)).toBe(StatusDeAutoavaliacao.EM_ANDAMENTO);
+
+    cadastro.registrarConceito(CPF_ANA, TESTES, "MPA");
+
+    expect(cadastro.statusDe(CPF_ANA)).toBe(StatusDeAutoavaliacao.CONCLUIDA);
+  })
+
+  it("volta a ficar em andamento quando um conceito é removido", () => {
+    cadastro.registrarConceito(CPF_ANA, ESPECIFICAR, "MA");
+    cadastro.registrarConceito(CPF_ANA, TESTES, "MPA");
+
+    cadastro.removerConceito(CPF_ANA, TESTES);
+
+    expect(cadastro.statusDe(CPF_ANA)).toBe(StatusDeAutoavaliacao.EM_ANDAMENTO);
+  })
+
+  it("é mantido depois que a auto-avaliação é encerrada", () => {
+    cadastro.registrarConceito(CPF_ANA, ESPECIFICAR, "MA");
+    cadastro.registrarConceito(CPF_ANA, TESTES, "MPA");
+
+    cadastro.getTurma().fecharAutoavaliacao();
+
+    expect(cadastro.statusDe(CPF_ANA)).toBe(StatusDeAutoavaliacao.CONCLUIDA);
+    expect(cadastro.statusDe(CPF_BRUNO)).toBe(StatusDeAutoavaliacao.PENDENTE);
+  })
 })
