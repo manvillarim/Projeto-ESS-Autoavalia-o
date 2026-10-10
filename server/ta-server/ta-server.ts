@@ -68,6 +68,20 @@ app.delete('/autoavaliacao/:cpf/:meta', function (req: express.Request, res: exp
   responder(res, autoavaliacoes.removerConceito(req.params.cpf, req.params.meta));
 })
 
+// Status da auto-avaliação de cada aluno da turma, com as contagens de quem
+// já concluiu e de quem ainda falta, para a tela de acompanhamento.
+app.get('/autoavaliacoes/status', function (req: express.Request, res: express.Response) {
+  var alunos = cadastro.getAlunos().map(function (aluno) {
+    return {"nome": aluno.nome, "cpf": aluno.cpf,
+            "status": autoavaliacoes.statusDe(aluno.cpf).toString()};
+  });
+  var concluidas: number = alunos.filter(a => a.status === "Completed").length;
+  var percentual: number = alunos.length === 0 ? 0 : Math.round(100 * concluidas / alunos.length);
+  res.send({"alunos": alunos, "concluidas": concluidas,
+            "faltando": alunos.length - concluidas, "percentualConcluido": percentual});
+})
+
+
 // Traduz um Resultado do domínio para a resposta HTTP, em um único lugar, para
 // que cada rota não repita essa decisão.
 function responder(res: express.Response, resultado: Resultado): void {

@@ -64,4 +64,16 @@ describe("O servidor", () => {
      });
   })
 
+
+  
+  it("informa o status da auto-avaliação de cada aluno cadastrado", () => {
+    var aluno: any = {"json": {"nome": "Ana", "cpf": "111", "email": "ana@cin.ufpe.br"}};
+    return request.post(base_url + "aluno", aluno).then(() =>
+      request.get(base_url + "autoavaliacoes/status", {"json": true}).then(body => {
+        expect(body.alunos).toContain({"nome": "Ana", "cpf": "111", "status": "Pending"});
+        expect(body.concluidas + body.faltando).toBe(body.alunos.length);
+        expect(body.percentualConcluido).toBe(Math.round(100 * body.concluidas / body.alunos.length));
+      })
+    );
+  })
 })
