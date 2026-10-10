@@ -1,4 +1,5 @@
 import { Conceito } from './conceito';
+import { StatusDeAutoavaliacao } from './statusdeautoavaliacao';
 
 // Entity: a auto-avaliação de um aluno em uma turma. Guarda, para cada meta, o
 // conceito que o próprio aluno se atribuiu. A estrutura usada para guardar os
@@ -32,5 +33,9 @@ export class Autoavaliacao {
 
   estaVazia(): boolean {
     return this.metasAvaliadas().length === 0;
+  }
+
+  statusPara(metas: string[]): StatusDeAutoavaliacao {
+    return StatusDeAutoavaliacao.PENDENTE;
   }
 }

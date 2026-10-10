@@ -2,6 +2,7 @@ import { Autoavaliacao } from '../../gui/ta-gui/src/app/autoavaliacao';
 import { Conceito } from '../../gui/ta-gui/src/app/conceito';
 import { Resultado } from '../../gui/ta-gui/src/app/resultado';
 import { Turma } from '../../gui/ta-gui/src/app/turma';
+import { StatusDeAutoavaliacao } from '../../gui/ta-gui/src/app/statusdeautoavaliacao';
 
 // Repositório das auto-avaliações de uma turma, e ponto de entrada das
 // operações que o aluno realiza sobre a sua própria auto-avaliação.
@@ -56,6 +57,11 @@ export class CadastroDeAutoavaliacoes {
     }
     return this.autoavaliacoes[cpf];
   }
+
+  statusDe(cpf: string): StatusDeAutoavaliacao {
+    return StatusDeAutoavaliacao.PENDENTE;
+  }
+
 
   getTurma(): Turma {
     return this.turma;
