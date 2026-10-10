@@ -58,8 +58,13 @@ export class CadastroDeAutoavaliacoes {
     return this.autoavaliacoes[cpf];
   }
 
+  // Consultar o status não cria auto-avaliação: quem nunca registrou nada
+  // está simplesmente pendente.
   statusDe(cpf: string): StatusDeAutoavaliacao {
-    return StatusDeAutoavaliacao.PENDENTE;
+    if (!Object.prototype.hasOwnProperty.call(this.autoavaliacoes, cpf)) {
+      return StatusDeAutoavaliacao.PENDENTE;
+    }
+    return this.autoavaliacoes[cpf].statusPara(this.turma.getMetas());
   }
 
 
