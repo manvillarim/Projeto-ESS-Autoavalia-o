@@ -39,7 +39,7 @@ describe("O status da auto-avaliação", () => {
     expect(cadastro.autoavaliacaoDe(CPF_BRUNO).estaVazia()).toBe(true);
   })
 
-  
+
   it("passa a concluída quando o aluno atribui conceito à última meta", () => {
     cadastro.registrarConceito(CPF_ANA, ESPECIFICAR, "MA");
     expect(cadastro.statusDe(CPF_ANA)).toBe(StatusDeAutoavaliacao.EM_ANDAMENTO);

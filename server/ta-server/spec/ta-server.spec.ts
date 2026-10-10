@@ -65,7 +65,7 @@ describe("O servidor", () => {
   })
 
 
-  
+
   it("informa o status da auto-avaliação de cada aluno cadastrado", () => {
     var aluno: any = {"json": {"nome": "Ana", "cpf": "111", "email": "ana@cin.ufpe.br"}};
     return request.post(base_url + "aluno", aluno).then(() =>
