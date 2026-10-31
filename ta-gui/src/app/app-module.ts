@@ -13,7 +13,7 @@ import { App } from './app';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideClientHydration(),
+    // provideClientHydration(),
   ],
   bootstrap: [App]
 })
