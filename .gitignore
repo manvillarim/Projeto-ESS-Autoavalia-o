@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+
+# Saida do compilador TypeScript do servidor
+compiledCode/
