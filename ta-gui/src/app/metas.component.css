@@ -1,0 +1,19 @@
+th {
+   background-color: #3399ff;
+   color: #ffffff;
+}
+td, th {
+   padding: 15px;
+   border-bottom: 1px solid #ddd;
+}
+tr:hover {
+   background-color: #cce6ff;
+}
+.meta {
+   text-align: center;
+}
+.meta input {
+   border: 1px solid #ccc;
+   width: 60px;
+   text-align: center;
+}

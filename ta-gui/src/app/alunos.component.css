@@ -1,0 +1,19 @@
+button {
+   font-family: Arial;
+   background-color: #cfd8dc;
+   border: none;
+   padding: 5px 10px;
+   border-radius: 4px;
+   cursor: pointer;
+}
+button:hover {
+   background-color: #b0bec5;
+}
+.lista th {
+   background-color: #3399ff;
+   color: #ffffff;
+}
+.lista td, .lista th {
+   padding: 10px 15px;
+   border-bottom: 1px solid #ddd;
+}
