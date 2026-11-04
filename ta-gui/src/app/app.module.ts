@@ -20,6 +20,7 @@ import { AlunoService } from './aluno.service';
     AppRoutingModule,
     FormsModule,
     RouterModule.forRoot([
+{ path: '', redirectTo: 'alunos', pathMatch: 'full' },
       {
         path: 'metas',
         component: MetasComponent
