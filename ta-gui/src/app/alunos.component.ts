@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Aluno } from '../../../common/aluno';
 import { AlunoService } from './aluno.service';
 
@@ -14,17 +14,17 @@ import { AlunoService } from './aluno.service';
     alunos: Aluno[] = [];
     cpfduplicado: boolean = false;
 
-    constructor(private alunoService: AlunoService) {}
+    constructor(private alunoService: AlunoService, private cdr: ChangeDetectorRef) {}
 
      criarAluno(a: Aluno): void {
        this.alunoService.criar(a)
               .subscribe(
                 ar => {
                   if (ar) {
-                    this.alunos.push(ar);
+                    this.alunos.push(ar); this.cdr.markForCheck();
                     this.aluno = new Aluno();
                   } else {
-                    this.cpfduplicado = true;
+                    this.cpfduplicado = true; this.cdr.markForCheck();
                   } 
                 },
                 msg => { alert(msg.message); }
@@ -38,7 +38,7 @@ import { AlunoService } from './aluno.service';
      ngOnInit(): void {
        this.alunoService.getAlunos()
              .subscribe(
-               as => { this.alunos = as; },
+               as => { this.alunos = as; this.cdr.markForCheck(); },
                msg => { alert(msg.message); }
               );
      }

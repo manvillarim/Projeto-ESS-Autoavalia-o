@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NgModule } from '@angular/core';
 
 import { Aluno } from '../../../common/aluno';
@@ -11,7 +11,7 @@ import { AlunoService } from './aluno.service';
    styleUrls: ['./metas.component.css']
  })
  export class MetasComponent implements OnInit {
-    constructor(private alunoService: AlunoService) {}
+    constructor(private alunoService: AlunoService, private cdr: ChangeDetectorRef) {}
 
     alunos: Aluno[];
 
@@ -25,7 +25,7 @@ import { AlunoService } from './aluno.service';
     ngOnInit(): void {
       this.alunoService.getAlunos()
       .subscribe(
-         (as) =>  { this.alunos = as; },
+         (as) =>  { this.alunos = as; this.cdr.markForCheck(); },
          (msg) => { alert(msg.message); }
       );
     }
