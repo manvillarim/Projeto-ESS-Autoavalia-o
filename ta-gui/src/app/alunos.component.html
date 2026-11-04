@@ -30,12 +30,14 @@
     <th>CPF</th>
     <th>e-mail</th>
     <th>GitHub</th>
+    <th></th>
  </tr>
  <tr *ngFor="let a of alunos">
     <td>{{a.nome}}</td>
     <td>{{a.cpf}}</td>
     <td>{{a.email}}</td>
     <td>{{a.github}}</td>
+    <td><button (click)="removerAluno(a)">Remover</button></td>
  </tr>
  </table>
 

@@ -27,6 +27,13 @@ export class CadastroDeAlunos {
      return result;
    }
 
+    remover(cpf: string): boolean {
+     var i = this.alunos.findIndex(a => a.cpf == cpf);
+     if (i == -1) return false;
+     this.alunos.splice(i, 1);
+     return true;
+   }
+
     getAlunos(): Aluno[] {
      return this.alunos;
    }

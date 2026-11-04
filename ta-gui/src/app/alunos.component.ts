@@ -32,6 +32,19 @@ import { AlunoService } from './aluno.service';
               );
     } 
 
+    removerAluno(a: Aluno): void {
+      this.alunoService.remover(a).subscribe(
+        ar => {
+          if (ar) {
+            this.alunos = this.alunos.filter(x => x.cpf != a.cpf); this.cdr.markForCheck();
+          } else {
+            alert("Nao foi possivel remover o aluno.");
+          }
+        },
+        msg => { alert(msg.message); }
+      );
+    }
+
     onMove(): void {
        this.cpfduplicado = false; this.githubduplicado = false;
     }
