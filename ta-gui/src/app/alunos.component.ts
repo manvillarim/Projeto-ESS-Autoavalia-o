@@ -13,6 +13,7 @@ import { AlunoService } from './aluno.service';
     aluno: Aluno = new Aluno();
     alunos: Aluno[] = [];
     cpfduplicado: boolean = false;
+    githubduplicado: boolean = false;
 
     constructor(private alunoService: AlunoService, private cdr: ChangeDetectorRef) {}
 
@@ -24,7 +25,7 @@ import { AlunoService } from './aluno.service';
                     this.alunos.push(ar); this.cdr.markForCheck();
                     this.aluno = new Aluno();
                   } else {
-                    this.cpfduplicado = true; this.cdr.markForCheck();
+                    this.cpfduplicado = !!this.alunos.find(x => x.cpf == a.cpf); this.githubduplicado = !!this.alunos.find(x => x.github == a.github); this.cdr.markForCheck();
                   } 
                 },
                 msg => { alert(msg.message); }
@@ -32,7 +33,7 @@ import { AlunoService } from './aluno.service';
     } 
 
     onMove(): void {
-       this.cpfduplicado = false;
+       this.cpfduplicado = false; this.githubduplicado = false;
     }
 
      ngOnInit(): void {

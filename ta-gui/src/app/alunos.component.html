@@ -20,6 +20,7 @@
  <tr>
   <td><label>GitHub </label></td>
   <td><input [(ngModel)]="aluno.github" ></td>
+  <td *ngIf="githubduplicado">Já existe um aluno com esse login GitHub</td>
  </tr>
  </table>
 
