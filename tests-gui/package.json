@@ -1,0 +1,30 @@
+{
+  "name": "tests-gui",
+  "version": "1.0.0",
+  "description": "Testes de GUI e end-to-end do teaching assistant, escritos em Cucumber e executados com Cypress",
+  "private": true,
+  "scripts": {
+    "test:gui": "cypress run --browser chrome --spec ../features/student-grade-management.feature --env tags=\"not @servico\"",
+    "test:integration": "cypress run --browser chrome --spec cypress/e2e/self-assessment-integration.feature",
+    "test": "cypress run --browser chrome --env tags=\"not @servico\"",
+    "open": "cypress open"
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^22.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.4",
+    "cypress": "^14.5.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": ["cypress/e2e/step_definitions/*.ts"],
+    "html": {
+      "enabled": true,
+      "output": "cypress/reports/cucumber-report.html"
+    },
+    "json": {
+      "enabled": true,
+      "output": "cypress/reports/cucumber-report.json"
+    }
+  }
+}

@@ -38,10 +38,14 @@ Feature: Student grade management
   Scenario: fail to register a concept that is not accepted by the class
     Given I have no concept registered for the goal "Write quality tests"
     When I assign the concept "XYZ" to the goal "Write quality tests"
+    And I save my self-assessment
     Then I see an error message stating that "XYZ" is not a valid concept
     And I see that the accepted concepts are "MA", "MPA" and "MANA"
     And I see the goal "Write quality tests" with no concept registered
 
+  # A pagina so oferece as metas que o servidor informa para a turma, logo esta
+  # regra nao e observavel pela interface e e verificada no servico.
+  @servico
   Scenario: fail to register a concept for a goal that does not belong to the class
     When I assign the concept "MA" to the goal "Understand configuration management concepts"
     Then I see an error message stating that the goal "Understand configuration management concepts" does not belong to "ESS 2025.1"
@@ -51,5 +55,6 @@ Feature: Student grade management
     Given I have the concept "MPA" registered for the goal "Specify requirements with quality"
     And the self-assessment of "ESS 2025.1" is closed
     When I assign the concept "MA" to the goal "Specify requirements with quality"
+    And I save my self-assessment
     Then I see an error message stating that the self-assessment of "ESS 2025.1" is closed
     And I see the concept "MPA" registered for the goal "Specify requirements with quality"
