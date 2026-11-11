@@ -1,0 +1,52 @@
+<main>
+  <h1 data-cy="page-title">My self-assessment</h1>
+
+  <p>
+    <span data-cy="student-name">{{ aluno.nome }}</span>
+    <span data-cy="class-name">{{ turma() }}</span>
+    <span data-cy="assessment-status">{{ aberta() ? 'open' : 'closed' }}</span>
+  </p>
+
+  @if (confirmacao()) {
+    <p class="confirmacao" data-cy="confirmation-message">{{ confirmacao() }}</p>
+  }
+  @if (erro()) {
+    <p class="erro" data-cy="error-message">{{ erro() }}</p>
+  }
+
+  <table>
+    <thead>
+      <tr>
+        <th>Goal</th>
+        <th>Registered concept</th>
+        <th>Concept</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (linha of linhas(); track linha.meta) {
+        <tr [attr.data-cy-goal]="linha.meta">
+          <td data-cy="goal-name">{{ linha.meta }}</td>
+          <td data-cy="registered-concept">{{ linha.registrado }}</td>
+          <td>
+            <input
+              data-cy="concept-input"
+              [ngModel]="linha.editado"
+              (ngModelChange)="atribuir(linha.meta, $event)"
+              [name]="linha.meta"
+            />
+          </td>
+          <td>
+            <button type="button" data-cy="remove-concept" (click)="remover(linha.meta)">
+              Remove
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <button type="button" data-cy="save-self-assessment" (click)="salvar()">
+    Save my self-assessment
+  </button>
+</main>

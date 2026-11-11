@@ -1,0 +1,41 @@
+main {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  color: #1b1b1f;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th,
+td {
+  border: 1px solid #c7c7cc;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+[data-cy='registered-concept'] {
+  font-weight: 600;
+  min-width: 9rem;
+}
+
+[data-cy='student-name'],
+[data-cy='class-name'],
+[data-cy='assessment-status'] {
+  margin-right: 1rem;
+  color: #46464f;
+}
+
+.confirmacao {
+  color: #0b6b2f;
+}
+
+.erro {
+  color: #b3261e;
+}
+
+button {
+  padding: 0.4rem 0.9rem;
+}

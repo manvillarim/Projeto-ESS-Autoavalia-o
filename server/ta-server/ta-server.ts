@@ -56,7 +56,7 @@ app.get('/autoavaliacao/:cpf', function (req: express.Request, res: express.Resp
     var conceito = autoavaliacao.conceitoDe(meta);
     conceitos[meta] = conceito ? conceito.toString() : null;
   });
-  res.send({"metas": turma.getMetas(), "conceitos": conceitos,
+  res.send({"turma": turma.getNome(), "metas": turma.getMetas(), "conceitos": conceitos,
             "aberta": turma.estaComAutoavaliacaoAberta()});
 })
 
