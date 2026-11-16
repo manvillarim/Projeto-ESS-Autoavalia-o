@@ -1,4 +1,4 @@
-import { Before, Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
+import { After, Before, Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 
 // Chave usada pela aplicação para cada meta, a partir do nome que aparece na tela.
 const GOAL_KEYS: { [goal: string]: string } = {
@@ -35,13 +35,22 @@ const saveConcepts = (name: string, concepts: { [key: string]: string }) => {
 const rowOf = (name: string) =>
   cy.contains("[data-cy=student-name]", new RegExp(`^\\s*${name}\\s*$`)).parent();
 
-// Cada cenário começa com a turma vazia, para não depender da ordem de execução.
-Before(() => {
-  students = {};
+const removeAllStudents = () => {
   cy.request(`${serverUrl()}/alunos`).then(response => {
     const registered = typeof response.body === "string" ? JSON.parse(response.body) : response.body;
     registered.forEach((s: any) => cy.request("DELETE", `${serverUrl()}/aluno/${s.cpf}`));
   });
+};
+
+// Cada cenário começa com a turma vazia, para não depender da ordem de execução,
+// e apaga ao final os alunos que criou, para não deixar efeitos colaterais.
+Before(() => {
+  students = {};
+  removeAllStudents();
+});
+
+After(() => {
+  removeAllStudents();
 });
 
 // ---------- Given ----------
