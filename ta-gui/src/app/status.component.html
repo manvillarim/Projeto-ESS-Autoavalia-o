@@ -1,0 +1,36 @@
+<h2>Status da autoavaliação</h2>
+
+<div *ngIf="carregado" data-cy="status-page">
+  <p data-cy="no-students-message" *ngIf="alunos.length === 0">
+    A turma não tem alunos
+  </p>
+
+  <div *ngIf="alunos.length > 0">
+    <p>
+      Concluíram: <span data-cy="completed-count">{{concluidas}}</span> |
+      Faltando: <span data-cy="missing-count">{{faltando}}</span> |
+      Percentual concluído: <span data-cy="completed-percentage">{{percentual}}%</span>
+    </p>
+
+    <p data-cy="all-completed-message" *ngIf="faltando === 0">
+      Todos os alunos concluíram a autoavaliação
+    </p>
+
+    <label>
+      <input type="checkbox" data-cy="only-missing-filter" [(ngModel)]="somenteFaltando">
+      Somente alunos que faltam
+    </label>
+    <button data-cy="sort-by-status" (click)="ordenarPorStatus()">Ordenar por status</button>
+  </div>
+
+  <table data-cy="student-list">
+    <tr *ngIf="alunosVisiveis.length > 0">
+      <th>Nome</th>
+      <th>Status</th>
+    </tr>
+    <tr *ngFor="let a of alunosVisiveis" data-cy="student-row">
+      <td data-cy="student-name">{{a.nome}}</td>
+      <td data-cy="student-status">{{a.status}}</td>
+    </tr>
+  </table>
+</div>

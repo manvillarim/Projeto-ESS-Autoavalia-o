@@ -8,13 +8,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MetasComponent } from './metas.component';
 import { AlunosComponent } from './alunos.component';
+import { StatusComponent } from './status.component';
 import { AlunoService } from './aluno.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     MetasComponent,
-    AlunosComponent
+    AlunosComponent,
+    StatusComponent
   ],
   imports: [
     BrowserModule,
@@ -30,6 +32,10 @@ import { AlunoService } from './aluno.service';
       {
         path: 'alunos',
         component: AlunosComponent
+      },
+      {
+        path: 'status',
+        component: StatusComponent
       }
     ])
   ],

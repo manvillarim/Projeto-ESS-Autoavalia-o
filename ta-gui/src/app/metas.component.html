@@ -9,14 +9,14 @@
     <th>Gerência de Projetos</th>
     <th>Testes</th>
  </tr>
- <tr *ngFor="let a of alunos">
+ <tr *ngFor="let a of alunos" [attr.data-cy]="'goals-row-' + a.cpf">
     <td>{{a.nome}}</td>
     <td>{{a.cpf}}</td>
     <td>{{a.email}}</td>
     <td>{{a.github}}</td>
-    <td class="meta"><input [(ngModel)]="a.metas['requisitos']" (change)="atualizarAluno(a)"></td>
-    <td class="meta"><input [(ngModel)]="a.metas['gerDeConfiguracao']" (change)="atualizarAluno(a)"></td>
-    <td class="meta"><input [(ngModel)]="a.metas['gerDeProjetos']" (change)="atualizarAluno(a)"></td>
-    <td class="meta"><input [(ngModel)]="a.metas['testes']" (change)="atualizarAluno(a)"></td>
+    <td class="meta"><input data-cy="goal-requisitos" [(ngModel)]="a.metas['requisitos']" (change)="atualizarAluno(a)"></td>
+    <td class="meta"><input data-cy="goal-gerDeConfiguracao" [(ngModel)]="a.metas['gerDeConfiguracao']" (change)="atualizarAluno(a)"></td>
+    <td class="meta"><input data-cy="goal-gerDeProjetos" [(ngModel)]="a.metas['gerDeProjetos']" (change)="atualizarAluno(a)"></td>
+    <td class="meta"><input data-cy="goal-testes" [(ngModel)]="a.metas['testes']" (change)="atualizarAluno(a)"></td>
  </tr>
  </table>
